@@ -74,3 +74,4 @@ INSERT INTO articles (title, content, author, published, category_id, category, 
     '/images/Ai generated.png',
     '2024-11-01'
 );
+
