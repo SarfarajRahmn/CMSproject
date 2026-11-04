@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Programming",
+    "description": "Software development, modern frameworks, JavaScript, Node.js, and best practices."
+  },
+  {
+    "id": 2,
+    "name": "AI",
+    "description": "Artificial intelligence, machine learning, deep learning models, and ethical AI."
+  },
+  {
+    "id": 3,
+    "name": "Data",
+    "description": "Relational and NoSQL databases, SQL optimization, data modeling, and pipelines."
+  },
+  {
+    "id": 4,
+    "name": "Technology",
+    "description": "Cloud computing, DevOps, emerging technology trends, and system infrastructure."
+  }
+]

@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>CMS Blog</span>
+    </a>
+    <button
+      class="navbar-toggler border-0"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarContent"
+      aria-controls="navbarContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+        <li class="nav-item">
+          <a class="nav-link <%= typeof page !== 'undefined' && page === 'home' ? 'active' : '' %>" href="/">
+            <i class="fa-solid fa-house me-1"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= typeof page !== 'undefined' && page === 'about' ? 'active' : '' %>" href="/about">
+            <i class="fa-solid fa-circle-info me-1"></i> About
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= typeof page !== 'undefined' && page === 'articles' ? 'active' : '' %>" href="/articles">
+            <i class="fa-solid fa-newspaper me-1"></i> Articles
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link <%= typeof page !== 'undefined' && page === 'categories' ? 'active' : '' %>" href="/categories">
+            <i class="fa-solid fa-folder-tree me-1"></i> Categories
+          </a>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        <a href="/articles/add" class="btn btn-sm btn-primary-custom">
+          <i class="fa-solid fa-plus me-1"></i> Add Article
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

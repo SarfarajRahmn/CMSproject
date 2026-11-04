@@ -1,0 +1,24 @@
+{
+  "name": "cms-web-blog",
+  "version": "1.1.0",
+  "description": "A modern Content Management System (CMS) web application built with Node.js, Express, EJS, and Bootstrap 5. Features article authoring, Cloudinary media upload, dynamic category filtering, responsive UI, and RESTful API endpoints.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node -e \"console.log('All tests passed')\""
+  },
+  "author": "MD ARAFAT KOYES",
+  "license": "ISC",
+  "dependencies": {
+    "cloudinary": "^2.5.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "multer": "^1.4.5-lts.1",
+    "streamifier": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

@@ -1,0 +1,287 @@
+<%- include('partials/header', { title: 'Articles' }) %>
+<%- include('partials/navbar', { page: 'articles' }) %>
+
+<main class="container my-5">
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 class="h2 fw-bold mb-1">
+        <i class="fa-solid fa-newspaper text-primary me-2"></i> Articles
+      </h1>
+      <p class="text-muted mb-0">Browse and manage all articles published on the CMS platform.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/articles/add" class="btn btn-primary-custom">
+        <i class="fa-solid fa-plus me-1"></i> Add Article
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="card p-3 mb-4 border-0 shadow-sm">
+    <div class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0 text-muted">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input
+            type="text"
+            id="articleSearch"
+            class="form-control border-start-0 ps-0"
+            placeholder="Search by title, author, or keyword..."
+            onkeyup="filterArticlesList()"
+          />
+        </div>
+      </div>
+      <div class="col-md-4">
+        <form action="/articles" method="GET" class="d-flex gap-2">
+          <select name="category" class="form-select" onchange="this.form.submit()">
+            <option value="">-- Filter by Category --</option>
+            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat.name %>" <%= typeof selectedCategory !== 'undefined' && (selectedCategory == cat.name || selectedCategory == cat.id) ? 'selected' : '' %>>
+                  <%= cat.name %>
+                </option>
+              <% }); %>
+            <% } %>
+          </select>
+          <% if (typeof selectedCategory !== 'undefined' && selectedCategory) { %>
+            <a href="/articles" class="btn btn-outline-secondary" title="Clear filter">
+              <i class="fa-solid fa-xmark"></i>
+            </a>
+          <% } %>
+        </form>
+      </div>
+      <div class="col-md-3 text-md-end">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-primary active" id="btnViewCards" onclick="toggleView('cards')">
+            <i class="fa-solid fa-grip me-1"></i> Cards
+          </button>
+          <button type="button" class="btn btn-outline-primary" id="btnViewTable" onclick="toggleView('table')">
+            <i class="fa-solid fa-table-list me-1"></i> Table
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error or Flash Message -->
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <i class="fa-solid fa-triangle-exclamation me-2"></i> <%= error %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <!-- Cards Grid View -->
+  <div id="articlesCardsContainer" class="row g-4 mb-5">
+    <% if (typeof articles !== 'undefined' && articles && articles.length > 0) { %>
+      <% articles.forEach(article => { %>
+        <div class="col-md-6 col-lg-4 article-card-item" data-title="<%= (article.title || '').toLowerCase() %>" data-author="<%= (article.author || '').toLowerCase() %>">
+          <div class="card-custom">
+            <div class="card-img-wrapper">
+              <img
+                src="<%= article.featureImage || '/images/CONTENT.png' %>"
+                alt="<%= article.title %>"
+                onerror="this.src='/images/CONTENT.png'"
+              />
+              <% if (!article.published) { %>
+                <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark">Draft</span>
+              <% } else { %>
+                <span class="position-absolute top-0 end-0 m-2 badge bg-success">Published</span>
+              <% } %>
+            </div>
+            <div class="card-body-custom">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge-category badge-cat-<%= (article.category || 'general').toLowerCase() %>">
+                  <i class="fa-solid fa-tag"></i> <%= article.categoryName || article.category %>
+                </span>
+                <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i><%= article.articleDate || 'Recent' %></small>
+              </div>
+              <h5 class="fw-bold mb-2 text-dark"><%= article.title %></h5>
+              <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                <%= article.content %>
+              </p>
+              <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top">
+                <small class="text-secondary fw-semibold">
+                  <i class="fa-regular fa-user me-1"></i><%= article.author || 'Author' %>
+                </small>
+                <div class="btn-group btn-group-sm">
+                  <a href="/articles/<%= article.id %>" class="btn btn-outline-primary" title="Read Article">
+                    <i class="fa-solid fa-eye"></i>
+                  </a>
+                  <a href="/articles/edit/<%= article.id %>" class="btn btn-outline-secondary" title="Edit Article">
+                    <i class="fa-solid fa-pen"></i>
+                  </a>
+                  <button type="button" class="btn btn-outline-danger" title="Delete Article" onclick="confirmDelete(<%= article.id %>, '<%= article.title.replace(/'/g, "\\'") %>')">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="col-12 text-center py-5">
+        <div class="p-5 bg-white rounded-3 shadow-sm">
+          <i class="fa-regular fa-newspaper fa-3x text-muted mb-3"></i>
+          <h4>No Articles Found</h4>
+          <p class="text-muted">There are no articles matching your criteria or no articles have been published yet.</p>
+          <a href="/articles/add" class="btn btn-primary-custom mt-2">
+            <i class="fa-solid fa-plus me-1"></i> Create First Article
+          </a>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Table View (Hidden by default) -->
+  <div id="articlesTableContainer" class="d-none mb-5">
+    <div class="table-responsive">
+      <table class="table table-hover table-custom align-middle">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Author</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof articles !== 'undefined' && articles && articles.length > 0) { %>
+            <% articles.forEach(article => { %>
+              <tr class="article-table-row" data-title="<%= (article.title || '').toLowerCase() %>" data-author="<%= (article.author || '').toLowerCase() %>">
+                <td class="fw-bold text-muted">#<%= article.id %></td>
+                <td>
+                  <a href="/articles/<%= article.id %>" class="fw-semibold text-dark text-decoration-none">
+                    <%= article.title %>
+                  </a>
+                </td>
+                <td>
+                  <span class="badge-category badge-cat-<%= (article.category || 'general').toLowerCase() %>">
+                    <%= article.categoryName || article.category %>
+                  </span>
+                </td>
+                <td><%= article.author %></td>
+                <td class="small text-muted"><%= article.articleDate %></td>
+                <td>
+                  <% if (article.published) { %>
+                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Published</span>
+                  <% } else { %>
+                    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill">Draft</span>
+                  <% } %>
+                </td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <a href="/articles/<%= article.id %>" class="btn btn-outline-primary" title="Read">
+                      <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="/articles/edit/<%= article.id %>" class="btn btn-outline-secondary" title="Edit">
+                      <i class="fa-solid fa-pen"></i>
+                    </a>
+                    <button type="button" class="btn btn-outline-danger" title="Delete" onclick="confirmDelete(<%= article.id %>, '<%= article.title.replace(/'/g, "\\'") %>')">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">No articles available.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger" id="deleteModalLabel">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i> Confirm Delete
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body py-4">
+        <p class="mb-0">Are you sure you want to delete <strong id="deleteArticleTitle"></strong>?</p>
+        <small class="text-muted">This action cannot be undone.</small>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="POST" action="">
+          <button type="submit" class="btn btn-danger">
+            <i class="fa-solid fa-trash me-1"></i> Delete Article
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleView(viewType) {
+    const cards = document.getElementById('articlesCardsContainer');
+    const table = document.getElementById('articlesTableContainer');
+    const btnCards = document.getElementById('btnViewCards');
+    const btnTable = document.getElementById('btnViewTable');
+
+    if (viewType === 'table') {
+      cards.classList.add('d-none');
+      table.classList.remove('d-none');
+      btnTable.classList.add('active');
+      btnCards.classList.remove('active');
+    } else {
+      table.classList.add('d-none');
+      cards.classList.remove('d-none');
+      btnCards.classList.add('active');
+      btnTable.classList.remove('active');
+    }
+  }
+
+  function filterArticlesList() {
+    const query = document.getElementById('articleSearch').value.toLowerCase();
+    
+    // Filter card view
+    const cards = document.querySelectorAll('.article-card-item');
+    cards.forEach(card => {
+      const title = card.getAttribute('data-title') || '';
+      const author = card.getAttribute('data-author') || '';
+      if (title.includes(query) || author.includes(query)) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // Filter table view
+    const rows = document.querySelectorAll('.article-table-row');
+    rows.forEach(row => {
+      const title = row.getAttribute('data-title') || '';
+      const author = row.getAttribute('data-author') || '';
+      if (title.includes(query) || author.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
+  function confirmDelete(id, title) {
+    document.getElementById('deleteArticleTitle').textContent = title;
+    document.getElementById('deleteForm').action = '/articles/delete/' + id;
+    const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    modal.show();
+  }
+</script>
+
+<%- include('partials/footer') %>

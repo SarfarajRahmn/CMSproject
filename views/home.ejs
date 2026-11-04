@@ -1,0 +1,153 @@
+<%- include('partials/header', { title: 'Home' }) %>
+<%- include('partials/navbar', { page: 'home' }) %>
+
+<main class="container my-4">
+  <!-- Hero Section -->
+  <section class="hero-section text-center text-md-start">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="hero-badge"><i class="fa-solid fa-sparkles me-1"></i> Modern Web CMS</span>
+        <h1 class="display-4 fw-bold text-white mb-3">Explore, Create & Share Engaging Content</h1>
+        <p class="lead text-white-50 mb-4">
+          A full-featured digital Content Management System built with Node.js, Express, and Bootstrap 5. Effortlessly author articles, upload media with Cloudinary, and organize by categories.
+        </p>
+        <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-md-start">
+          <a href="/articles" class="btn btn-primary-custom btn-lg">
+            <i class="fa-solid fa-book-open me-2"></i> Browse Articles
+          </a>
+          <a href="/articles/add" class="btn btn-secondary-custom btn-lg">
+            <i class="fa-solid fa-pen-to-square me-2"></i> Write New Article
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-center mt-4 mt-lg-0">
+        <img
+          src="/images/CONTENT.png"
+          alt="CMS Overview"
+          class="img-fluid rounded-4 shadow-lg"
+          style="max-height: 280px; object-fit: contain;"
+          onerror="this.src='/images/Ai generated.png'"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Stats -->
+  <section class="row g-3 mb-5">
+    <div class="col-6 col-md-3">
+      <div class="stat-box">
+        <div class="stat-number"><%= articles ? articles.length : 0 %></div>
+        <div class="text-muted small fw-semibold"><i class="fa-solid fa-newspaper me-1"></i> Total Articles</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-box">
+        <div class="stat-number"><%= articles ? articles.filter(a => a.published).length : 0 %></div>
+        <div class="text-muted small fw-semibold"><i class="fa-solid fa-check-circle me-1 text-success"></i> Published</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-box">
+        <div class="stat-number"><%= categories ? categories.length : 0 %></div>
+        <div class="text-muted small fw-semibold"><i class="fa-solid fa-folder me-1 text-warning"></i> Categories</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-box">
+        <div class="stat-number">100%</div>
+        <div class="text-muted small fw-semibold"><i class="fa-solid fa-bolt me-1 text-primary"></i> Responsive</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Articles -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="h3 fw-bold mb-1">Featured Articles</h2>
+        <p class="text-muted mb-0">Catch up on latest technical insights and stories</p>
+      </div>
+      <a href="/articles" class="btn btn-outline-primary btn-sm">
+        View All <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      <% if (articles && articles.length > 0) { %>
+        <% articles.slice(0, 3).forEach(article => { %>
+          <div class="col-md-6 col-lg-4">
+            <div class="card-custom">
+              <div class="card-img-wrapper">
+                <img
+                  src="<%= article.featureImage || '/images/CONTENT.png' %>"
+                  alt="<%= article.title %>"
+                  onerror="this.src='/images/CONTENT.png'"
+                />
+              </div>
+              <div class="card-body-custom">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge-category badge-cat-<%= (article.category || 'general').toLowerCase() %>">
+                    <i class="fa-solid fa-tag"></i> <%= article.categoryName || article.category %>
+                  </span>
+                  <small class="text-muted"><i class="fa-regular fa-calendar me-1"></i><%= article.articleDate || 'Recent' %></small>
+                </div>
+                <h5 class="fw-bold mb-2 text-dark text-truncate"><%= article.title %></h5>
+                <p class="text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                  <%= article.content %>
+                </p>
+                <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
+                  <small class="text-secondary fw-semibold"><i class="fa-regular fa-user me-1"></i><%= article.author || 'Author' %></small>
+                  <a href="/articles/<%= article.id %>" class="btn btn-sm btn-outline-primary">Read More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="col-12 text-center py-5">
+          <p class="text-muted">No articles found. Be the first to create one!</p>
+          <a href="/articles/add" class="btn btn-primary-custom">Add Article</a>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="h3 fw-bold mb-1">Explore by Category</h2>
+        <p class="text-muted mb-0">Browse through curated topics</p>
+      </div>
+      <a href="/categories" class="btn btn-outline-primary btn-sm">
+        All Categories <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-3">
+      <% if (categories && categories.length > 0) { %>
+        <% categories.forEach(category => { %>
+          <div class="col-sm-6 col-lg-3">
+            <div class="card p-3 border-0 shadow-sm h-100 hover-shadow transition">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3">
+                  <i class="fa-solid fa-folder-open fa-lg"></i>
+                </div>
+                <span class="badge bg-secondary-subtle text-secondary rounded-pill">
+                  <%= articles ? articles.filter(a => a.categoryId == category.id || a.category === category.name).length : 0 %> Posts
+                </span>
+              </div>
+              <h6 class="fw-bold mb-1"><%= category.name %></h6>
+              <p class="text-muted small mb-2"><%= category.description || 'Topic discussions and guides.' %></p>
+              <a href="/articles?category=<%= encodeURIComponent(category.name) %>" class="stretched-link small text-primary fw-semibold text-decoration-none">
+                Browse Category <i class="fa-solid fa-chevron-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,153 @@
+<%- include('partials/header', { title: 'Edit Article' }) %>
+<%- include('partials/navbar', { page: 'articles' }) %>
+
+<main class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="form-card">
+        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+          <div>
+            <h2 class="h3 fw-bold mb-1">
+              <i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Article
+            </h2>
+            <p class="text-muted small mb-0">Update article content, metadata, or feature image.</p>
+          </div>
+          <a href="/articles/<%= article.id %>" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-xmark me-1"></i> Cancel
+          </a>
+        </div>
+
+        <form action="/articles/edit/<%= article.id %>" method="POST" enctype="multipart/form-data">
+          <!-- Title -->
+          <div class="mb-3">
+            <label for="title" class="form-label fw-bold">Article Title <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              name="title"
+              value="<%= article.title %>"
+              required
+            />
+          </div>
+
+          <!-- Category & Author Row -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="category" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+              <select class="form-select" id="category" name="category" required>
+                <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
+                  <% categories.forEach(cat => { %>
+                    <option
+                      value="<%= cat.name %>"
+                      <%= (article.category == cat.name || article.categoryId == cat.id) ? 'selected' : '' %>
+                    >
+                      <%= cat.name %>
+                    </option>
+                  <% }); %>
+                <% } else { %>
+                  <option value="<%= article.category %>" selected><%= article.category %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="author" class="form-label fw-bold">Author Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="author"
+                name="author"
+                value="<%= article.author || 'MD ARAFAT KOYES' %>"
+              />
+            </div>
+          </div>
+
+          <!-- Feature Image Replacement -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Current Feature Image</label>
+            <% if (article.featureImage) { %>
+              <div class="mb-2">
+                <img
+                  src="<%= article.featureImage %>"
+                  alt="Current"
+                  class="img-thumbnail rounded"
+                  style="max-height: 140px;"
+                />
+              </div>
+            <% } %>
+            <input type="hidden" name="existingImage" value="<%= article.featureImage || '' %>" />
+            <label for="featureImage" class="form-label small text-muted">Upload New Image (optional, replaces current image)</label>
+            <input
+              type="file"
+              class="form-control"
+              id="featureImage"
+              name="featureImage"
+              accept="image/*"
+              onchange="previewUploadedImage(this)"
+            />
+            <div id="imagePreviewContainer" class="mt-2 d-none text-center p-2 bg-light rounded-3 border">
+              <img id="imagePreview" src="#" alt="New Preview" class="img-fluid rounded" style="max-height: 180px;" />
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="mb-4">
+            <label for="content" class="form-label fw-bold">Article Content <span class="text-danger">*</span></label>
+            <textarea
+              class="form-control"
+              id="content"
+              name="content"
+              rows="8"
+              required
+            ><%= article.content %></textarea>
+          </div>
+
+          <!-- Published Switch -->
+          <div class="mb-4 p-3 bg-light rounded-3 border">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="published"
+                name="published"
+                <%= article.published ? 'checked' : '' %>
+              />
+              <label class="form-check-label fw-semibold" for="published">
+                Published
+              </label>
+            </div>
+            <small class="text-muted d-block mt-1">When checked, this article appears in the public feed.</small>
+          </div>
+
+          <!-- Form Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="/articles/<%= article.id %>" class="btn btn-secondary-custom">Cancel</a>
+            <button type="submit" class="btn btn-primary-custom">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function previewUploadedImage(input) {
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    const previewImage = document.getElementById('imagePreview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewContainer.classList.remove('d-none');
+      }
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      previewContainer.classList.add('d-none');
+    }
+  }
+</script>
+
+<%- include('partials/footer') %>
