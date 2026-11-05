@@ -8,8 +8,8 @@
     "dev": "nodemon index.js",
     "test": "node -e \"console.log('All tests passed')\""
   },
-  "author": "MD ARAFAT KOYES",
-  "license": "ISC",
+  "author": "Sarfaraj Rahman",
+  "license": "MIT",
   "dependencies": {
     "cloudinary": "^2.5.1",
     "dotenv": "^16.4.7",

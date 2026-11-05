@@ -5,36 +5,42 @@
 [![EJS](https://img.shields.io/badge/Templates-EJS-orange.svg?style=flat)](https://ejs.co/)
 [![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.3-purple.svg?style=flat&logo=bootstrap)](https://getbootstrap.com/)
 [![Cloudinary](https://img.shields.io/badge/Media-Cloudinary-blue.svg?style=flat&logo=cloudinary)](https://cloudinary.com/)
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![GitHub](https://img.shields.io/badge/GitHub-SarfarajRahmn-black.svg?style=flat&logo=github)](https://github.com/SarfarajRahmn/CMSproject)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-A full-featured, responsive **Content Management System (CMS)** web application engineered with **Node.js**, **Express**, **EJS templates**, and **Bootstrap 5**. Designed for publishing, managing, filtering, and organizing digital articles across customizable categories with cloud-backed media uploads.
+A full-featured, responsive **Content Management System (CMS)** web application developed by **Sarfaraj Rahman**. Built with **Node.js**, **Express**, **EJS templates**, and **Bootstrap 5**, this project delivers a publishing platform for creating, editing, categorizing, and managing digital articles with cloud-backed media uploads.
 
 ---
 
 ## 🌟 Key Features
 
-- **Dynamic EJS Templating**: Modular view architecture using reusable partials (`header`, `navbar`, `footer`).
 - **Full Article CRUD Operations**:
-  - **Create**: Add new articles with rich content, category association, and author info.
-  - **Read**: Grid card view and structured table view with real-time search.
-  - **Update**: Edit existing articles with pre-filled metadata and image replacement.
-  - **Delete**: Remove articles with confirmation modals.
-- **Media Upload with Cloudinary**:
-  - In-memory file processing using **Multer** and **Streamifier**.
-  - Direct buffer streaming to Cloudinary cloud storage CDN.
-  - Automatic fallback images for offline development.
-- **Dynamic Category Taxonomy**:
-  - Filter articles by category or publication date (`minDate`).
-  - Dedicated category explorer with article counters.
-- **Dual Format Support (Web & REST API)**:
-  - Serves interactive HTML web pages for browsers.
-  - Returns structured JSON for programmatic consumption and automated testing when requested via `Accept: application/json` or `?format=json`.
-- **Hybrid Storage Resilience**:
-  - Default JSON file persistence (`data/articles.json`, `data/categories.json`) with auto-save.
-  - Seamless optional integration with **PostgreSQL** (Neon.tech / Supabase / local DB).
-- **Modern Responsive UI**:
-  - Built with Bootstrap 5.3, custom CSS variables, and Font Awesome 6 icons.
-  - Interactive search, view toggling (Cards / Table), and instant image upload previews.
+  - **Create**: Write and publish rich articles with author attribution, categories, and image upload.
+  - **Read**: Interactive catalog with real-time keyword search, category filtering, and toggleable **Card** & **Table** views.
+  - **Update**: Edit existing articles in place with pre-filled metadata and media replacement.
+  - **Delete**: Safe article removal with modal confirmations.
+- **Dynamic EJS Architecture**:
+  - Modular view architecture utilizing clean, reusable partials (`header`, `navbar`, `footer`).
+  - Active page indicators, accessible navigation, and breadcrumb navigation.
+- **Cloudinary Media Upload**:
+  - In-memory buffer uploads via **Multer** and **Streamifier**.
+  - Direct streaming to Cloudinary CDN for optimized image delivery.
+  - Automatic fallback images for seamless offline development.
+- **Dynamic Taxonomy & Filtering**:
+  - Real-time client-side search across titles and authors.
+  - Filter articles dynamically by category or publication date (`minDate`).
+  - Dedicated category hub with post counters and quick filters.
+- **Dual Format Architecture (Web & REST API)**:
+  - Serves interactive HTML web pages for standard browsers.
+  - Serves structured JSON responses when requested via `Accept: application/json` or `?format=json`.
+  - Dedicated `/api/*` endpoints for easy third-party integration or mobile frontends.
+- **Resilient Hybrid Storage**:
+  - In-memory cache with automatic persistence to local JSON files (`data/articles.json`, `data/categories.json`).
+  - Seamless optional integration with **PostgreSQL** (Neon.tech, Supabase, or local PostgreSQL).
+- **Polished Modern UI**:
+  - Clean theme built with Bootstrap 5.3, CSS custom properties, and Font Awesome 6 icons.
+  - Instant client-side image preview before form submission.
+  - Fully responsive across mobile, tablet, and desktop devices.
 
 ---
 
@@ -48,20 +54,20 @@ CMSproject/
 ├── public/
 │   ├── css/
 │   │   ├── main.css            # Custom modern theme styles
-│   │   └── site.css            # Alias stylesheet
-│   ├── images/                 # Static graphical assets
-│   └── favicon.ico             # App icon
+│   │   └── site.css            # Stylesheet alias
+│   ├── images/                 # Graphical assets
+│   └── favicon.ico             # Application icon
 ├── views/
 │   ├── partials/
 │   │   ├── header.ejs          # HTML head, styles & meta tags
 │   │   ├── navbar.ejs          # Responsive navigation bar
-│   │   └── footer.ejs          # Footer and bundle scripts
-│   ├── 404.ejs                 # Friendly 404 page
+│   │   └── footer.ejs          # Footer with credits & scripts
+│   ├── 404.ejs                 # Custom 404 page
 │   ├── about.ejs               # Developer bio & system overview
 │   ├── addArticle.ejs          # Article creation form
 │   ├── article.ejs             # Single article reading view
-│   ├── articles.ejs            # Articles catalog (grid & table)
-│   ├── categories.ejs          # Categories management & grid
+│   ├── articles.ejs            # Articles catalog (grid & table views)
+│   ├── categories.ejs          # Categories management
 │   ├── editArticle.ejs         # Article editing form
 │   └── home.ejs                # Hero landing page & featured posts
 ├── .env.example                # Sample environment variables
@@ -75,7 +81,7 @@ CMSproject/
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 Getting Started
 
 ### 1. Prerequisites
 - **Node.js** (v18.x or later recommended)
@@ -94,7 +100,7 @@ npm install
 ```
 
 ### 4. Configure Environment Variables
-Create a `.env` file in the project root:
+Copy the example environment file:
 ```bash
 cp .env.example .env
 ```
@@ -110,7 +116,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ### 5. Run the Application
 
-**Development Mode (with auto-reload):**
+**Development Mode (auto-reload via nodemon):**
 ```bash
 npm run dev
 ```
@@ -120,7 +126,7 @@ npm run dev
 npm start
 ```
 
-Visit the app in your browser at: **`http://localhost:8080`**
+Open your browser and navigate to: **`http://localhost:8080`**
 
 ---
 
@@ -130,7 +136,7 @@ Visit the app in your browser at: **`http://localhost:8080`**
 | :--- | :--- | :--- | :--- |
 | `/api/articles` | `GET` | `category`, `minDate` | Retrieve all or filtered articles (JSON) |
 | `/api/articles/published` | `GET` | — | Retrieve published articles only (JSON) |
-| `/api/articles/:id` | `GET` | — | Retrieve single article by ID (JSON) |
+| `/api/articles/:id` | `GET` | — | Retrieve a single article by ID (JSON) |
 | `/api/categories` | `GET` | — | Retrieve list of all categories (JSON) |
 | `/articles?format=json` | `GET` | `category`, `minDate` | Retrieve articles in JSON format |
 | `/categories?format=json` | `GET` | — | Retrieve categories in JSON format |
@@ -141,15 +147,15 @@ Visit the app in your browser at: **`http://localhost:8080`**
 
 | Route | Method | Description |
 | :--- | :--- | :--- |
-| `/` | `GET` | Homepage with hero section, stats, and featured articles |
-| `/about` | `GET` | Developer bio, tech stack, and project overview |
+| `/` | `GET` | Landing page with hero banner, quick stats, and featured posts |
+| `/about` | `GET` | Developer profile, technical skills, and system architecture |
 | `/articles` | `GET` | Article catalog with search, category filtering, and view toggle |
-| `/articles/:id` | `GET` | Detailed article reading view |
-| `/articles/add` | `GET` | Add article form with image upload |
+| `/articles/:id` | `GET` | Dedicated article reading view |
+| `/articles/add` | `GET` | Article creation form with image upload |
 | `/articles/add` | `POST` | Process article creation and Cloudinary image upload |
-| `/articles/edit/:id`| `GET` | Edit article form |
+| `/articles/edit/:id`| `GET` | Article editing form |
 | `/articles/edit/:id`| `POST` | Process article update |
-| `/articles/delete/:id` | `POST` / `GET` | Delete article by ID |
+| `/articles/delete/:id` | `POST` / `GET` | Delete an article by ID |
 | `/categories` | `GET` | Category catalog and management |
 | `/categories/add` | `POST` | Create a new category |
 
@@ -157,21 +163,25 @@ Visit the app in your browser at: **`http://localhost:8080`**
 
 ## ☁️ Deployment
 
-### Deploy to Vercel
-This project includes a pre-configured `vercel.json` for seamless serverless deployment:
-1. Connect your GitHub repository to [Vercel](https://vercel.com).
-2. Set Environment Variables in Vercel project settings (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`).
-3. Deploy!
+### Deploying on Vercel
+The repository includes a production-ready `vercel.json` configured for serverless deployment:
+1. Import this repository into [Vercel](https://vercel.com).
+2. Add your environment variables in the Vercel dashboard:
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+3. Click **Deploy**.
 
 ---
 
-## 👤 Academic Information
+## 👨‍💻 Author & Maintainer
 
-- **Student Name**: MD ARAFAT KOYES
-- **Student Number**: 133682229
-- **Student Email**: [makoyes@myseneca.ca](mailto:makoyes@myseneca.ca)
-- **Institution**: Seneca College
-- **Course**: WEB322 - Web Programming
+**Sarfaraj Rahman**
+- **GitHub**: [@SarfarajRahmn](https://github.com/SarfarajRahmn)
+- **Repository**: [https://github.com/SarfarajRahmn/CMSproject](https://github.com/SarfarajRahmn/CMSproject)
 
-### Declaration
-I declare that this assignment is my own work in accordance with Seneca Academic Policy. No part of this assignment has been copied manually or electronically from any other source (including websites) or distributed to other students.
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE) &bull; Feel free to use and adapt it for your own projects.

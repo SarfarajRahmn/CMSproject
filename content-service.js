@@ -82,7 +82,7 @@ function enrichArticle(article) {
     ),
     articleDate: article.articleDate || new Date().toISOString().split("T")[0],
     featureImage: article.featureImage || "/images/CONTENT.png",
-    author: article.author || "MD ARAFAT KOYES",
+    author: article.author || "Sarfaraj Rahman",
   };
 }
 
@@ -282,7 +282,7 @@ module.exports = {
         if (!categoryName) categoryName = "General";
 
         const articleDate = articleData.articleDate || new Date().toISOString().split("T")[0];
-        const author = articleData.author && articleData.author.trim() ? articleData.author.trim() : "MD ARAFAT KOYES";
+        const author = articleData.author && articleData.author.trim() ? articleData.author.trim() : "Sarfaraj Rahman";
         const featureImage = articleData.featureImage || "/images/CONTENT.png";
 
         if (isDbMode && pool) {
@@ -359,7 +359,7 @@ module.exports = {
           const values = [
             articleData.title,
             articleData.content,
-            articleData.author || "MD ARAFAT KOYES",
+            articleData.author || "Sarfaraj Rahman",
             published,
             categoryId,
             categoryName,
