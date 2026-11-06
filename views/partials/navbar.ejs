@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <i class="fa-solid fa-layer-group"></i>
-      <span>CMS Blog</span>
+      <i class="fa-solid fa-graduation-cap text-info"></i>
+      <span>DevAcademy &bull; CMS</span>
     </a>
     <button
       class="navbar-toggler border-0"
@@ -23,13 +23,13 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link <%= typeof page !== 'undefined' && page === 'about' ? 'active' : '' %>" href="/about">
-            <i class="fa-solid fa-circle-info me-1"></i> About
+          <a class="nav-link <%= typeof page !== 'undefined' && page === 'courses' ? 'active' : '' %>" href="/courses">
+            <i class="fa-solid fa-book-bookmark me-1 text-warning"></i> Courses
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link <%= typeof page !== 'undefined' && page === 'articles' ? 'active' : '' %>" href="/articles">
-            <i class="fa-solid fa-newspaper me-1"></i> Articles
+            <i class="fa-solid fa-newspaper me-1"></i> Blog & Articles
           </a>
         </li>
         <li class="nav-item">
@@ -37,13 +37,26 @@
             <i class="fa-solid fa-folder-tree me-1"></i> Categories
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link <%= typeof page !== 'undefined' && page === 'about' ? 'active' : '' %>" href="/about">
+            <i class="fa-solid fa-circle-info me-1"></i> About
+          </a>
+        </li>
       </ul>
       <div class="d-flex align-items-center gap-2">
-        <a href="/articles/add" class="btn btn-sm btn-primary-custom">
-          <i class="fa-solid fa-plus me-1"></i> Add Article
+        <a href="/courses" class="btn btn-sm btn-outline-light">
+          <i class="fa-solid fa-fire me-1 text-warning"></i> Browse Courses
         </a>
+        <div class="dropdown">
+          <button class="btn btn-sm btn-primary-custom dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fa-solid fa-plus me-1"></i> Create
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+            <li><a class="dropdown-item py-2" href="/courses/add"><i class="fa-solid fa-graduation-cap text-warning me-2"></i>New Course</a></li>
+            <li><a class="dropdown-item py-2" href="/articles/add"><i class="fa-solid fa-pen-nib text-primary me-2"></i>New Article</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </nav>
-

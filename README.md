@@ -14,6 +14,11 @@ A full-featured, responsive **Content Management System (CMS)** web application 
 
 ## 🌟 Key Features
 
+- **Course E-Commerce & Academy Platform**:
+  - **Course Catalog**: Filterable catalog of courses with price tags, discount badges, ratings, difficulty levels, and durations.
+  - **Curriculum & Syllabus Accordion**: Interactive modules and lectures breakdown for each course.
+  - **Direct Enrollment & Checkout**: Modal checkout workflow with student contact collection, payment method selection, and instant confirmation receipt.
+  - **Instructor Management**: Publish, edit, or delete courses dynamically with thumbnail uploads and pricing controls.
 - **Full Article CRUD Operations**:
   - **Create**: Write and publish rich articles with author attribution, categories, and image upload.
   - **Read**: Interactive catalog with real-time keyword search, category filtering, and toggleable **Card** & **Table** views.
@@ -134,6 +139,9 @@ Open your browser and navigate to: **`http://localhost:8080`**
 
 | Endpoint | Method | Query Parameters | Description |
 | :--- | :--- | :--- | :--- |
+| `/api/courses` | `GET` | — | Retrieve all published courses (JSON) |
+| `/api/courses/:id` | `GET` | — | Retrieve single course with full curriculum (JSON) |
+| `/api/courses/enroll`| `POST` | — | Process student enrollment / order (JSON) |
 | `/api/articles` | `GET` | `category`, `minDate` | Retrieve all or filtered articles (JSON) |
 | `/api/articles/published` | `GET` | — | Retrieve published articles only (JSON) |
 | `/api/articles/:id` | `GET` | — | Retrieve a single article by ID (JSON) |
@@ -147,7 +155,15 @@ Open your browser and navigate to: **`http://localhost:8080`**
 
 | Route | Method | Description |
 | :--- | :--- | :--- |
-| `/` | `GET` | Landing page with hero banner, quick stats, and featured posts |
+| `/` | `GET` | Landing page with hero banner, quick stats, featured courses, and articles |
+| `/courses` | `GET` | Courses catalog with search, category filter pills, and price tags |
+| `/courses/:id` | `GET` | In-depth course page with curriculum, instructor bio, and enroll CTA |
+| `/courses/add` | `GET` | Publish new course form with thumbnail upload |
+| `/courses/add` | `POST` | Process course creation |
+| `/courses/edit/:id` | `GET` | Edit course form |
+| `/courses/edit/:id` | `POST` | Process course updates |
+| `/courses/delete/:id`| `POST` | Delete course by ID |
+| `/courses/enroll` | `POST` | Process course enrollment and render confirmation receipt |
 | `/about` | `GET` | Developer profile, technical skills, and system architecture |
 | `/articles` | `GET` | Article catalog with search, category filtering, and view toggle |
 | `/articles/:id` | `GET` | Dedicated article reading view |

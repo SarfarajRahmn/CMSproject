@@ -1,0 +1,168 @@
+<%- include('partials/header', { title: 'Edit Course' }) %>
+<%- include('partials/navbar', { page: 'courses' }) %>
+
+<main class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="form-card">
+        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+          <div>
+            <h2 class="h3 fw-bold mb-1">
+              <i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Course
+            </h2>
+            <p class="text-muted small mb-0">Update course details, pricing, syllabus, or thumbnail.</p>
+          </div>
+          <a href="/courses/<%= course.id %>" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-xmark me-1"></i> Cancel
+          </a>
+        </div>
+
+        <form action="/courses/edit/<%= course.id %>" method="POST" enctype="multipart/form-data">
+          <!-- Course Title -->
+          <div class="mb-3">
+            <label for="title" class="form-label fw-bold">Course Title <span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              id="title"
+              name="title"
+              value="<%= course.title %>"
+              required
+            />
+          </div>
+
+          <!-- Subtitle -->
+          <div class="mb-3">
+            <label for="subtitle" class="form-label fw-bold">Short Subtitle / Description <span class="text-danger">*</span></label>
+            <textarea
+              class="form-control"
+              id="subtitle"
+              name="subtitle"
+              rows="2"
+              required
+            ><%= course.subtitle %></textarea>
+          </div>
+
+          <!-- Category, Level, Badge Row -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label for="category" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
+              <select class="form-select" id="category" name="category" required>
+                <% const categories = ['Web Development', 'AI & Machine Learning', 'Database & SQL', 'Cloud & DevOps', 'Mobile Development', 'Cybersecurity']; %>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat %>" <%= course.category === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="level" class="form-label fw-bold">Difficulty Level</label>
+              <select class="form-select" id="level" name="level">
+                <option value="All Levels" <%= course.level === 'All Levels' ? 'selected' : '' %>>All Levels</option>
+                <option value="Beginner to Advanced" <%= course.level === 'Beginner to Advanced' ? 'selected' : '' %>>Beginner to Advanced</option>
+                <option value="Intermediate" <%= course.level === 'Intermediate' ? 'selected' : '' %>>Intermediate</option>
+                <option value="Advanced" <%= course.level === 'Advanced' ? 'selected' : '' %>>Advanced</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="badge" class="form-label fw-bold">Promotional Badge</label>
+              <select class="form-select" id="badge" name="badge">
+                <option value="New" <%= course.badge === 'New' ? 'selected' : '' %>>New</option>
+                <option value="Bestseller" <%= course.badge === 'Bestseller' ? 'selected' : '' %>>Bestseller</option>
+                <option value="Hot" <%= course.badge === 'Hot' ? 'selected' : '' %>>Hot & Trending</option>
+                <option value="Popular" <%= course.badge === 'Popular' ? 'selected' : '' %>>Popular</option>
+                <option value="" <%= !course.badge ? 'selected' : '' %>>None</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Pricing & Duration Row -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-3">
+              <label for="price" class="form-label fw-bold">Price ($ USD) <span class="text-danger">*</span></label>
+              <input type="number" step="1" class="form-control" id="price" name="price" value="<%= course.price %>" required />
+            </div>
+            <div class="col-md-3">
+              <label for="originalPrice" class="form-label fw-bold">Original Price ($)</label>
+              <input type="number" step="1" class="form-control" id="originalPrice" name="originalPrice" value="<%= course.originalPrice %>" />
+            </div>
+            <div class="col-md-3">
+              <label for="duration" class="form-label fw-bold">Duration</label>
+              <input type="text" class="form-control" id="duration" name="duration" value="<%= course.duration %>" />
+            </div>
+            <div class="col-md-3">
+              <label for="lessonsCount" class="form-label fw-bold">Lessons Count</label>
+              <input type="number" class="form-control" id="lessonsCount" name="lessonsCount" value="<%= course.lessonsCount %>" />
+            </div>
+          </div>
+
+          <!-- Thumbnail -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Current Thumbnail</label>
+            <% if (course.thumbnail) { %>
+              <div class="mb-2">
+                <img src="<%= course.thumbnail %>" alt="Thumbnail" class="img-thumbnail rounded" style="max-height: 140px;" />
+              </div>
+            <% } %>
+            <input type="hidden" name="existingThumbnail" value="<%= course.thumbnail || '' %>" />
+            <label for="featureImage" class="form-label small text-muted">Upload New Thumbnail (optional)</label>
+            <input
+              type="file"
+              class="form-control"
+              id="featureImage"
+              name="featureImage"
+              accept="image/*"
+              onchange="previewCourseThumbnail(this)"
+            />
+            <div id="courseThumbnailPreviewContainer" class="mt-2 d-none text-center p-2 bg-light rounded-3 border">
+              <img id="courseThumbnailPreview" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" />
+            </div>
+          </div>
+
+          <!-- Published Switch -->
+          <div class="mb-4 p-3 bg-light rounded-3 border">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="published"
+                name="published"
+                <%= course.published ? 'checked' : '' %>
+              />
+              <label class="form-check-label fw-semibold" for="published">
+                Published on catalog
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <a href="/courses/<%= course.id %>" class="btn btn-secondary-custom">Cancel</a>
+            <button type="submit" class="btn btn-primary-custom">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  function previewCourseThumbnail(input) {
+    const container = document.getElementById('courseThumbnailPreviewContainer');
+    const preview = document.getElementById('courseThumbnailPreview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        container.classList.remove('d-none');
+      }
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      container.classList.add('d-none');
+    }
+  }
+</script>
+
+<%- include('partials/footer') %>

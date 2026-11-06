@@ -295,3 +295,123 @@ footer.footer-custom a {
 footer.footer-custom a:hover {
   text-decoration: underline;
 }
+
+/* ==========================================================================
+   Course Catalog & E-Commerce Styles
+   ========================================================================== */
+
+.course-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.course-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px rgba(13, 71, 161, 0.12);
+  border-color: #90caf9;
+}
+
+.course-thumbnail-wrapper {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: #0a192f;
+}
+
+.course-thumbnail-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.course-card:hover .course-thumbnail-wrapper img {
+  transform: scale(1.06);
+}
+
+.course-badge-pill {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.badge-bestseller { background: #ff9800; color: #fff; }
+.badge-hot { background: #e91e63; color: #fff; }
+.badge-new { background: #00c853; color: #fff; }
+.badge-trending { background: #2979ff; color: #fff; }
+.badge-popular { background: #7c4dff; color: #fff; }
+
+.price-tag {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1b5e20;
+}
+
+.original-price-tag {
+  font-size: 0.95rem;
+  text-decoration: line-through;
+  color: #9e9e9e;
+  margin-left: 6px;
+}
+
+.rating-stars {
+  color: #ffb300;
+  font-size: 0.88rem;
+}
+
+.course-meta-item {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.syllabus-accordion .accordion-button {
+  font-weight: 600;
+  font-size: 1rem;
+  background-color: #f8fafc;
+  color: var(--dark-navy);
+}
+
+.syllabus-accordion .accordion-button:not(.collapsed) {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  box-shadow: none;
+}
+
+.lesson-list-item {
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lesson-list-item:last-child {
+  border-bottom: none;
+}
+
+.enroll-card-sticky {
+  position: sticky;
+  top: 90px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}

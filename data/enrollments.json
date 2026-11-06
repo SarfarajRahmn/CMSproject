@@ -1,0 +1,24 @@
+[
+  {
+    "id": "ENR-1001",
+    "courseId": 1,
+    "courseTitle": "Full-Stack Web Development Bootcamp",
+    "studentName": "Alex Chen",
+    "studentEmail": "alex.chen@example.com",
+    "paymentMethod": "Card",
+    "amountPaid": 79,
+    "enrollmentDate": "2024-11-01",
+    "status": "Active"
+  },
+  {
+    "id": "ENR-1002",
+    "courseId": 2,
+    "courseTitle": "Artificial Intelligence & Generative AI Masterclass",
+    "studentName": "Sara Jenkins",
+    "studentEmail": "sara.j@example.com",
+    "paymentMethod": "PayPal",
+    "amountPaid": 99,
+    "enrollmentDate": "2024-11-03",
+    "status": "Active"
+  }
+]

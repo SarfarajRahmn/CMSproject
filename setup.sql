@@ -75,3 +75,37 @@ INSERT INTO articles (title, content, author, published, category_id, category, 
     '2024-11-01'
 );
 
+
+
+-- Courses table
+CREATE TABLE IF NOT EXISTS courses (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    subtitle TEXT,
+    category VARCHAR(100) NOT NULL,
+    level VARCHAR(50) DEFAULT 'All Levels',
+    price NUMERIC(10, 2) NOT NULL,
+    original_price NUMERIC(10, 2),
+    duration VARCHAR(50),
+    lessons_count INTEGER DEFAULT 10,
+    rating NUMERIC(3, 2) DEFAULT 5.0,
+    reviews_count INTEGER DEFAULT 0,
+    enrolled_count INTEGER DEFAULT 0,
+    badge VARCHAR(50),
+    thumbnail TEXT,
+    published BOOLEAN DEFAULT true
+);
+
+-- Enrollments table
+CREATE TABLE IF NOT EXISTS enrollments (
+    id VARCHAR(50) PRIMARY KEY,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    course_title VARCHAR(255) NOT NULL,
+    student_name VARCHAR(255) NOT NULL,
+    student_email VARCHAR(255) NOT NULL,
+    student_phone VARCHAR(50),
+    payment_method VARCHAR(50) DEFAULT 'Card',
+    amount_paid NUMERIC(10, 2) NOT NULL,
+    enrollment_date DATE DEFAULT CURRENT_DATE,
+    status VARCHAR(50) DEFAULT 'Confirmed'
+);

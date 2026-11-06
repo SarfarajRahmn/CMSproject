@@ -44,10 +44,10 @@ function ensureInitialized() {
     initPromise = contentService
       .initialize()
       .then(() => {
-        console.log("Content service initialized successfully.");
+        console.log("Content & Course services initialized successfully.");
       })
       .catch((err) => {
-        console.error("Failed to initialize content service:", err);
+        console.error("Failed to initialize service:", err);
         throw err;
       });
   }
@@ -81,7 +81,7 @@ function expectsJson(req) {
 function uploadToCloudinary(fileBuffer) {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { resource_type: "image", folder: "cms_articles" },
+      { resource_type: "image", folder: "cms_assets" },
       (error, result) => {
         if (result && result.secure_url) {
           resolve(result.secure_url);
@@ -97,19 +97,20 @@ function uploadToCloudinary(fileBuffer) {
 }
 
 // -----------------------------------------------------------------------------
-// Routes
+// Core Routes
 // -----------------------------------------------------------------------------
 
 // Home Route
 app.get("/", async (req, res) => {
   try {
-    const [articles, categories] = await Promise.all([
+    const [articles, categories, courses] = await Promise.all([
       contentService.getAllArticles().catch(() => []),
       contentService.getCategories().catch(() => []),
+      contentService.getAllCourses().catch(() => []),
     ]);
-    res.render("home", { articles, categories, page: "home" });
+    res.render("home", { articles, categories, courses, page: "home" });
   } catch (err) {
-    res.render("home", { articles: [], categories: [], page: "home" });
+    res.render("home", { articles: [], categories: [], courses: [], page: "home" });
   }
 });
 
@@ -118,13 +119,186 @@ app.get("/about", (req, res) => {
   res.render("about", { page: "about" });
 });
 
+// -----------------------------------------------------------------------------
+// Course Management & Sales Routes
+// -----------------------------------------------------------------------------
+
+// List All Courses (Catalog)
+app.get("/courses", async (req, res) => {
+  const { category, search } = req.query;
+
+  try {
+    let courses = await (category
+      ? contentService.getCoursesByCategory(category)
+      : contentService.getAllCourses());
+
+    if (search) {
+      const q = search.toLowerCase();
+      courses = courses.filter(
+        (c) =>
+          c.title.toLowerCase().includes(q) ||
+          c.subtitle.toLowerCase().includes(q) ||
+          c.category.toLowerCase().includes(q)
+      );
+    }
+
+    if (expectsJson(req)) {
+      return res.json(courses);
+    }
+
+    res.render("courses", {
+      courses,
+      selectedCategory: category || "",
+      searchQuery: search || "",
+      page: "courses",
+    });
+  } catch (err) {
+    if (expectsJson(req)) {
+      return res.status(500).json({ message: "Error loading courses", error: err.message });
+    }
+    res.render("courses", { courses: [], selectedCategory: "", searchQuery: "", page: "courses" });
+  }
+});
+
+// Form to Publish a New Course
+app.get("/courses/add", (req, res) => {
+  res.render("addCourse", { page: "courses" });
+});
+
+// Handle Course Creation
+app.post(
+  "/courses/add",
+  upload.single("featureImage"),
+  async (req, res) => {
+    try {
+      let thumbnailUrl = "/images/CONTENT.png";
+
+      if (req.file) {
+        try {
+          thumbnailUrl = await uploadToCloudinary(req.file.buffer);
+        } catch (uploadErr) {
+          console.warn("Cloudinary upload failed on course:", uploadErr.message);
+        }
+      }
+
+      req.body.thumbnail = thumbnailUrl;
+      const newCourse = await contentService.addCourse(req.body);
+
+      if (expectsJson(req)) {
+        return res.status(201).json(newCourse);
+      }
+      res.redirect(`/courses/${newCourse.id}`);
+    } catch (err) {
+      console.error("Error creating course:", err);
+      if (expectsJson(req)) {
+        res.status(500).json({ message: "Failed to create course", error: err.message });
+      } else {
+        res.redirect("/courses");
+      }
+    }
+  }
+);
+
+// Course Details Page
+app.get("/courses/:id", async (req, res) => {
+  try {
+    const course = await contentService.getCourseById(req.params.id);
+
+    if (expectsJson(req)) {
+      return res.json(course);
+    }
+
+    res.render("courseDetail", { course, page: "courses" });
+  } catch (err) {
+    if (expectsJson(req)) {
+      return res.status(404).json({ message: "Course not found" });
+    }
+    res.status(404).render("404", { title: "Course Not Found" });
+  }
+});
+
+// Form to Edit an Existing Course
+app.get("/courses/edit/:id", async (req, res) => {
+  try {
+    const course = await contentService.getCourseById(req.params.id);
+    res.render("editCourse", { course, page: "courses" });
+  } catch (err) {
+    res.status(404).render("404", { title: "Course Not Found" });
+  }
+});
+
+// Handle Course Update
+app.post(
+  "/courses/edit/:id",
+  upload.single("featureImage"),
+  async (req, res) => {
+    const courseId = req.params.id;
+
+    try {
+      let thumbnailUrl = req.body.existingThumbnail || "";
+
+      if (req.file) {
+        try {
+          thumbnailUrl = await uploadToCloudinary(req.file.buffer);
+        } catch (uploadErr) {
+          console.warn("Cloudinary upload failed on edit course:", uploadErr.message);
+        }
+      }
+
+      if (thumbnailUrl) {
+        req.body.thumbnail = thumbnailUrl;
+      }
+
+      await contentService.updateCourse(courseId, req.body);
+      res.redirect(`/courses/${courseId}`);
+    } catch (err) {
+      console.error("Error updating course:", err);
+      res.status(500).redirect(`/courses/${courseId}`);
+    }
+  }
+);
+
+// Handle Course Deletion
+app.post("/courses/delete/:id", async (req, res) => {
+  try {
+    await contentService.deleteCourse(req.params.id);
+    res.redirect("/courses");
+  } catch (err) {
+    console.error("Error deleting course:", err);
+    res.status(500).redirect("/courses");
+  }
+});
+
+// Handle Student Enrollment / Checkout
+app.post("/courses/enroll", async (req, res) => {
+  try {
+    const { enrollment, course } = await contentService.enrollStudent(req.body);
+
+    if (expectsJson(req)) {
+      return res.status(200).json({ success: true, enrollment, course });
+    }
+
+    res.render("enrollmentSuccess", { enrollment, course, page: "courses" });
+  } catch (err) {
+    console.error("Enrollment failed:", err);
+    if (expectsJson(req)) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
+    res.status(400).redirect("/courses");
+  }
+});
+
+// -----------------------------------------------------------------------------
+// Articles Management Routes
+// -----------------------------------------------------------------------------
+
 // Display Add Article Form
 app.get("/articles/add", async (req, res) => {
   try {
     const categories = await contentService.getCategories().catch(() => []);
-    res.render("addArticle", { categories, page: "addArticle" });
+    res.render("addArticle", { categories, page: "articles" });
   } catch (err) {
-    res.render("addArticle", { categories: [], page: "addArticle" });
+    res.render("addArticle", { categories: [], page: "articles" });
   }
 });
 
@@ -316,7 +490,37 @@ app.post("/categories/add", async (req, res) => {
   }
 });
 
+// -----------------------------------------------------------------------------
 // Dedicated REST API Endpoints
+// -----------------------------------------------------------------------------
+
+app.get("/api/courses", async (req, res) => {
+  try {
+    const courses = await contentService.getAllCourses();
+    res.json(courses);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.get("/api/courses/:id", async (req, res) => {
+  try {
+    const course = await contentService.getCourseById(req.params.id);
+    res.json(course);
+  } catch (err) {
+    res.status(404).json({ message: "Course not found" });
+  }
+});
+
+app.post("/api/courses/enroll", async (req, res) => {
+  try {
+    const result = await contentService.enrollStudent(req.body);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 app.get("/api/articles", async (req, res) => {
   const { category, minDate } = req.query;
   try {

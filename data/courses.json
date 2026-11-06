@@ -1,0 +1,189 @@
+[
+  {
+    "id": 1,
+    "title": "Full-Stack Web Development Bootcamp",
+    "subtitle": "Master modern HTML5, CSS3, JavaScript ES6+, Node.js, Express, React, and PostgreSQL from scratch.",
+    "category": "Web Development",
+    "level": "Beginner to Advanced",
+    "price": 79,
+    "originalPrice": 149,
+    "duration": "14 Weeks (60+ Hours)",
+    "lessonsCount": 78,
+    "rating": 4.9,
+    "reviewsCount": 428,
+    "enrolledCount": 1850,
+    "badge": "Bestseller",
+    "thumbnail": "/images/WEB.png",
+    "instructor": {
+      "name": "Sarfaraj Rahman",
+      "title": "Senior Full-Stack Engineer & Cloud Architect",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
+    },
+    "highlights": [
+      "Build 8 real-world full-stack web applications",
+      "Master modern JavaScript (ES6+), Node.js, Express & REST APIs",
+      "Database design with PostgreSQL, Prisma ORM & MongoDB",
+      "Deploy scalable apps to Vercel, Render, and AWS",
+      "Includes portfolio reviews, GitHub optimization, and interview prep"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Web Fundamentals & Modern CSS Grid/Flexbox",
+        "lessons": ["Semantic HTML5 & Accessibility", "Responsive CSS3, Flexbox & CSS Grid", "Bootstrap 5 & Tailwind CSS Masterclass", "Project 1: Modern Corporate Landing Page"]
+      },
+      {
+        "module": "Module 2: Advanced JavaScript (ES6+) & DOM",
+        "lessons": ["Data Types, Closures & Scope", "Asynchronous JS, Promises & Async/Await", "DOM Manipulation & Event Loop", "Project 2: Interactive Task Management App"]
+      },
+      {
+        "module": "Module 3: Backend Engineering with Node.js & Express",
+        "lessons": ["Node.js Architecture & Streams", "Building Robust RESTful APIs with Express", "Authentication with JWT & Bcrypt", "Project 3: Full-Stack Content Management System"]
+      },
+      {
+        "module": "Module 4: Databases, Cloud & Production Deployment",
+        "lessons": ["Relational Modeling with PostgreSQL", "File Uploads with Cloudinary & Multer", "Deployment on Vercel & Render", "CI/CD Pipelines with GitHub Actions"]
+      }
+    ],
+    "published": true
+  },
+  {
+    "id": 2,
+    "title": "Artificial Intelligence & Generative AI Masterclass",
+    "subtitle": "Hands-on engineering with LLMs, OpenAI API, LangChain, RAG architectures, and PyTorch.",
+    "category": "AI & Machine Learning",
+    "level": "Intermediate",
+    "price": 99,
+    "originalPrice": 199,
+    "duration": "10 Weeks (45+ Hours)",
+    "lessonsCount": 54,
+    "rating": 4.95,
+    "reviewsCount": 312,
+    "enrolledCount": 1240,
+    "badge": "Hot & New",
+    "thumbnail": "/images/AI.png",
+    "instructor": {
+      "name": "Sarfaraj Rahman",
+      "title": "AI Systems Engineer",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
+    },
+    "highlights": [
+      "Build production-grade AI agents with LangChain & LlamaIndex",
+      "Master Retrieval-Augmented Generation (RAG) with Vector Databases",
+      "Fine-tune open-source models using HuggingFace & PyTorch",
+      "Deploy AI applications to cloud infrastructure with Docker"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Foundations of Machine Learning & Neural Nets",
+        "lessons": ["Python for Data Science & PyTorch basics", "Supervised vs Unsupervised Learning", "Neural Network Architectures & Backpropagation"]
+      },
+      {
+        "module": "Module 2: Large Language Models (LLMs) & Prompt Engineering",
+        "lessons": ["Transformer Architecture Deep Dive", "Structured Prompting & Few-Shot Learning", "Function Calling & Structured Outputs with OpenAI/Gemini"]
+      },
+      {
+        "module": "Module 3: Building Vector RAG Systems",
+        "lessons": ["Embeddings & Semantic Search", "Vector Databases: Pinecone, Qdrant & Chroma", "Chunking Strategies & Hybrid Search"]
+      },
+      {
+        "module": "Module 4: Autonomous Multi-Agent Workflows",
+        "lessons": ["Agentic Architectures & Tool Use", "Memory Management in AI Agents", "Project: Enterprise Customer Intelligence Agent"]
+      }
+    ],
+    "published": true
+  },
+  {
+    "id": 3,
+    "title": "Mastering PostgreSQL & Advanced Database Architecture",
+    "subtitle": "Learn high-performance database design, query optimization, indexing strategies, and scaling.",
+    "category": "Database & SQL",
+    "level": "All Levels",
+    "price": 49,
+    "originalPrice": 89,
+    "duration": "6 Weeks (28+ Hours)",
+    "lessonsCount": 42,
+    "rating": 4.88,
+    "reviewsCount": 190,
+    "enrolledCount": 940,
+    "badge": "Trending",
+    "thumbnail": "/images/CONTENT.png",
+    "instructor": {
+      "name": "Sarfaraj Rahman",
+      "title": "Database Architect",
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"
+    },
+    "highlights": [
+      "Master complex SQL queries, window functions, and CTEs",
+      "Learn indexing internals (B-Tree, GIN, GiST, BRIN)",
+      "Database schema modeling, normalization & ACID transactions",
+      "Performance profiling with EXPLAIN ANALYZE & query tuning",
+      "Replication, connection pooling with PgBouncer, and cloud DBs (Neon/Supabase)"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Advanced SQL & Relational Modeling",
+        "lessons": ["Relational Integrity & Normalization", "Window Functions & Analytic Queries", "Common Table Expressions (CTEs) & Recursive Queries"]
+      },
+      {
+        "module": "Module 2: Indexing & Query Tuning",
+        "lessons": ["Anatomy of an Index: B-Trees & Beyond", "Reading Query Plans with EXPLAIN (ANALYZE, BUFFERS)", "Eliminating Table Scans & Optimizing Joins"]
+      },
+      {
+        "module": "Module 3: Concurrency, Locking & Transactions",
+        "lessons": ["Transaction Isolation Levels", "Row-Level Locking vs Table Locks", "Deadlock Prevention & Handling"]
+      },
+      {
+        "module": "Module 4: Scaling & Cloud Migration",
+        "lessons": ["Partitioning Large Tables", "Connection Pooling with PgBouncer", "Serverless PostgreSQL with Neon.tech"]
+      }
+    ],
+    "published": true
+  },
+  {
+    "id": 4,
+    "title": "Cloud DevOps, Docker & Kubernetes Engineering",
+    "subtitle": "Learn containerization, CI/CD automation, Kubernetes orchestration, and cloud infrastructure.",
+    "category": "Cloud & DevOps",
+    "level": "Intermediate to Advanced",
+    "price": 69,
+    "originalPrice": 129,
+    "duration": "8 Weeks (36+ Hours)",
+    "lessonsCount": 50,
+    "rating": 4.92,
+    "reviewsCount": 245,
+    "enrolledCount": 1100,
+    "badge": "Popular",
+    "thumbnail": "/images/Ai generated.png",
+    "instructor": {
+      "name": "Sarfaraj Rahman",
+      "title": "DevOps & Cloud Engineer",
+      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"
+    },
+    "highlights": [
+      "Containerize multi-tier web applications with Docker",
+      "Orchestrate microservices with Kubernetes (Pods, Services, Ingress)",
+      "Automated CI/CD with GitHub Actions & automated testing",
+      "Infrastructure as Code (IaC) with Terraform basics",
+      "Production monitoring with Prometheus & Grafana"
+    ],
+    "syllabus": [
+      {
+        "module": "Module 1: Docker Deep Dive",
+        "lessons": ["Container Architecture vs Virtual Machines", "Writing Production Dockerfiles & Multi-Stage Builds", "Docker Compose for Local Multi-Service Development"]
+      },
+      {
+        "module": "Module 2: CI/CD Automation",
+        "lessons": ["GitHub Actions Workflows", "Automated Linting, Testing & Security Scans", "Pushing Images to Docker Hub & GitHub Container Registry"]
+      },
+      {
+        "module": "Module 3: Kubernetes Orchestration",
+        "lessons": ["Kubernetes Architecture & Minikube", "Deployments, ReplicaSets & Rolling Updates", "Service Networking & Ingress Controllers"]
+      },
+      {
+        "module": "Module 4: Observability & Production Readiness",
+        "lessons": ["Centralized Logging with Fluentd", "Metrics & Alerting with Prometheus", "Zero-Downtime Deployment Strategies"]
+      }
+    ],
+    "published": true
+  }
+]
