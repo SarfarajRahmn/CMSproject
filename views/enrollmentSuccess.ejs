@@ -1,4 +1,4 @@
-<%- include('partials/header', { title: 'Enrollment Confirmed!' }) %>
+<%- include('partials/header', { title: 'এনরোলমেন্ট সফল হয়েছে!' }) %>
 <%- include('partials/navbar', { page: 'courses' }) %>
 
 <main class="container my-5 text-center">
@@ -7,50 +7,62 @@
       <div class="p-4 p-md-5 bg-white rounded-4 shadow-sm border my-3">
         <!-- Success Icon -->
         <div class="mb-3 text-success">
-          <i class="fa-solid fa-circle-check fa-4x animate__animated animate__bounceIn"></i>
+          <i class="fa-solid fa-circle-check fa-4x"></i>
         </div>
 
         <span class="badge bg-success bg-opacity-10 text-success px-3 py-1.5 rounded-pill fw-bold mb-2">
-          Payment & Enrollment Verified
+          পেমেন্ট ও এনরোলমেন্ট কনফার্মড
         </span>
 
-        <h2 class="fw-bold mb-2">Congratulations, <%= enrollment.studentName %>!</h2>
+        <h2 class="fw-bold mb-2">অভিনন্দন, <%= enrollment.studentName %>!</h2>
         <p class="text-muted mb-4">
-          You are officially enrolled in <strong><%= course.title %></strong>. A confirmation email with receipt and portal access credentials has been sent to <strong><%= enrollment.studentEmail %></strong>.
+          আপনি সফলভাবে <strong><%= course.title %></strong> কোর্সে এনরোল করেছেন। আপনার দেওয়া ইমেইল <strong><%= enrollment.studentEmail %></strong> ও মোবাইল নম্বরে অ্যাক্সেস লিঙ্ক পাঠানো হয়েছে।
         </p>
 
         <!-- Receipt Box -->
         <div class="p-4 bg-light rounded-3 text-start mb-4 border">
           <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted small">Enrollment ID:</span>
+            <span class="text-muted small">অর্ডার / এনরোলমেন্ট আইডি:</span>
             <strong class="font-monospace text-dark"><%= enrollment.id %></strong>
           </div>
           <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted small">Course:</span>
-            <strong class="text-dark"><%= course.title %></strong>
+            <span class="text-muted small">কোর্স:</span>
+            <strong class="text-dark text-truncate" style="max-width: 250px;"><%= course.title %></strong>
           </div>
           <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted small">Payment Method:</span>
-            <span><%= enrollment.paymentMethod %></span>
+            <span class="text-muted small">পেমেন্ট মেথড:</span>
+            <span class="badge bg-secondary"><%= enrollment.paymentMethod %></span>
           </div>
+          <% if (enrollment.trxId) { %>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">Transaction ID (TrxID):</span>
+              <strong class="font-monospace text-primary"><%= enrollment.trxId %></strong>
+            </div>
+          <% } %>
+          <% if (enrollment.studentPhone) { %>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">মোবাইল নম্বর:</span>
+              <span><%= enrollment.studentPhone %></span>
+            </div>
+          <% } %>
           <div class="d-flex justify-content-between mb-2">
-            <span class="text-muted small">Date:</span>
+            <span class="text-muted small">তারিখ:</span>
             <span><%= enrollment.enrollmentDate %></span>
           </div>
           <hr class="my-2" />
           <div class="d-flex justify-content-between align-items-center">
-            <span class="fw-bold">Total Paid:</span>
-            <span class="fw-bold text-success fs-5">$<%= enrollment.amountPaid %> USD</span>
+            <span class="fw-bold">পরিশোধিত ফি:</span>
+            <span class="fw-bold text-success fs-4">৳<%= Number(enrollment.amountPaid).toLocaleString('en-IN') %> BDT</span>
           </div>
         </div>
 
         <!-- Next Action Buttons -->
         <div class="d-flex flex-wrap gap-2 justify-content-center">
           <a href="/courses/<%= course.id %>" class="btn btn-primary-custom px-4">
-            <i class="fa-solid fa-play-circle me-1"></i> Access Course Syllabus
+            <i class="fa-solid fa-play-circle me-1"></i> কোর্স ক্লাসরুমে যান
           </a>
           <a href="/courses" class="btn btn-outline-secondary px-4">
-            Browse More Courses
+            অন্যান্য কোর্স দেখুন
           </a>
         </div>
       </div>

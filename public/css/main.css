@@ -415,3 +415,67 @@ footer.footer-custom a:hover {
   box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
+
+
+/* ==========================================================================
+   Responsive & Reactive Enhancements
+   ========================================================================== */
+
+@media (min-width: 768px) {
+  .border-end-md {
+    border-right: 1px solid var(--border-color);
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero-section {
+    padding: 2.5rem 1.25rem;
+    border-radius: var(--radius-md);
+  }
+
+  .stat-box {
+    padding: 1rem 0.75rem;
+  }
+
+  .stat-number {
+    font-size: 1.6rem;
+  }
+
+  .course-thumbnail-wrapper {
+    height: 180px;
+  }
+
+  .card-body-custom {
+    padding: 1.15rem;
+  }
+
+  /* Padding for fixed bottom bar on course detail page */
+  body.course-detail-page {
+    padding-bottom: 80px;
+  }
+}
+
+/* Touch-friendly buttons & smooth focus */
+.cat-filter-btn {
+  border-radius: 50px;
+  padding: 0.35rem 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.cat-filter-btn.active {
+  box-shadow: 0 4px 10px rgba(13, 71, 161, 0.25);
+  transform: translateY(-1px);
+}
+
+.pay-opt-btn {
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.pay-opt-btn.active {
+  background-color: #0d47a1 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 10px rgba(13, 71, 161, 0.25);
+}

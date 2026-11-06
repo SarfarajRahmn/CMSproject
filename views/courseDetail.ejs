@@ -1,7 +1,7 @@
-<%- include('partials/header', { title: course.title }) %>
+<%- include('partials/header', { title: course.title, bodyClass: 'course-detail-page' }) %>
 <%- include('partials/navbar', { page: 'courses' }) %>
 
-<main class="container my-5">
+<main class="container my-4 my-md-5">
   <!-- Breadcrumb -->
   <nav aria-label="breadcrumb" class="mb-4">
     <ol class="breadcrumb">
@@ -11,7 +11,7 @@
     </ol>
   </nav>
 
-  <div class="row g-5">
+  <div class="row g-4 g-lg-5">
     <!-- Main Content Area -->
     <div class="col-lg-8">
       <!-- Course Header -->
@@ -38,12 +38,39 @@
           <div class="d-flex align-items-center gap-1">
             <span class="text-warning"><i class="fa-solid fa-star"></i></span>
             <strong class="text-dark"><%= course.rating || 4.9 %></strong>
-            <span>(<%= course.reviewsCount || 120 %> student ratings)</span>
+            <span>(<%= course.reviewsCount || 120 %> স্টুডেন্ট রেটিং)</span>
           </div>
           <div>&bull;</div>
-          <div><i class="fa-solid fa-users me-1 text-primary"></i><%= (course.enrolledCount || 0).toLocaleString() %> students enrolled</div>
+          <div><i class="fa-solid fa-users me-1 text-primary"></i><%= (course.enrolledCount || 0).toLocaleString('en-IN') %>+ শিক্ষার্থী যুক্ত আছেন</div>
           <div>&bull;</div>
           <div><i class="fa-regular fa-clock me-1"></i><%= course.duration %></div>
+        </div>
+      </div>
+
+      <!-- Mobile Course Banner (Only visible on small screens) -->
+      <div class="d-lg-none mb-4">
+        <img
+          src="<%= course.thumbnail || '/images/CONTENT.png' %>"
+          alt="<%= course.title %>"
+          class="img-fluid rounded-4 shadow-sm w-100"
+          style="max-height: 240px; object-fit: cover;"
+          onerror="this.src='/images/CONTENT.png'"
+        />
+        <div class="d-flex align-items-center justify-content-between p-3 bg-white rounded-4 shadow-sm border mt-3">
+          <div>
+            <div class="small text-muted">কোর্স ফি:</div>
+            <span class="fs-3 fw-bold text-success">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
+            <% if (course.originalPrice && course.originalPrice > course.price) { %>
+              <span class="text-decoration-line-through text-muted small ms-1">৳<%= Number(course.originalPrice).toLocaleString('en-IN') %></span>
+            <% } %>
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary-custom px-4 py-2 fw-bold"
+            onclick="openEnrollModal(<%= course.id %>, '<%= course.title.replace(/'/g, "\\'") %>', <%= course.price %>)"
+          >
+            এনরোল করুন
+          </button>
         </div>
       </div>
 
@@ -57,16 +84,16 @@
             style="width: 55px; height: 55px; object-fit: cover;"
           />
           <div>
-            <div class="small text-muted">Created & Instructed by</div>
+            <div class="small text-muted">ইন্সট্রাক্টর ও মেন্টর</div>
             <h6 class="fw-bold mb-0 text-dark"><%= course.instructor ? course.instructor.name : 'Sarfaraj Rahman' %></h6>
-            <div class="small text-secondary"><%= course.instructor ? course.instructor.title : 'Senior Engineer & Educator' %></div>
+            <div class="small text-secondary"><%= course.instructor ? course.instructor.title : 'Senior Full-Stack Engineer' %></div>
           </div>
         </div>
       </div>
 
       <!-- What You'll Learn -->
-      <section class="card p-4 border rounded-4 shadow-sm mb-5">
-        <h4 class="fw-bold mb-3"><i class="fa-solid fa-check-double text-success me-2"></i>What You'll Learn</h4>
+      <section class="card p-4 border rounded-4 shadow-sm mb-4 mb-md-5">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-check-double text-success me-2"></i>এই কোর্সে আপনি যা শিখবেন</h4>
         <div class="row g-3">
           <% if (course.highlights && course.highlights.length > 0) { %>
             <% course.highlights.forEach(highlight => { %>
@@ -78,16 +105,16 @@
               </div>
             <% }); %>
           <% } else { %>
-            <div class="col-12 text-muted">Comprehensive hands-on training with production projects.</div>
+            <div class="col-12 text-muted">হ্যান্ডস-অন লাইভ প্রজেক্ট ও পূর্ণাঙ্গ গাইডলাইন।</div>
           <% } %>
         </div>
       </section>
 
       <!-- Curriculum Syllabus Accordion -->
-      <section class="mb-5">
+      <section class="mb-4 mb-md-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4 class="fw-bold mb-0">Course Content & Curriculum</h4>
-          <span class="text-muted small"><%= course.syllabus ? course.syllabus.length : 0 %> Modules &bull; <%= course.lessonsCount %> Lectures</span>
+          <h4 class="fw-bold mb-0">কোর্স কারিকুলাম ও মডিউল</h4>
+          <span class="text-muted small"><%= course.syllabus ? course.syllabus.length : 0 %> মডিউল &bull; <%= course.lessonsCount %> লেকচার</span>
         </div>
 
         <div class="accordion syllabus-accordion shadow-sm rounded-4 overflow-hidden" id="syllabusAccordion">
@@ -105,7 +132,7 @@
                   >
                     <i class="fa-solid fa-layer-group me-2 text-primary"></i>
                     <strong><%= mod.module || ('Module ' + (idx + 1)) %></strong>
-                    <span class="ms-auto text-muted small me-3"><%= mod.lessons ? mod.lessons.length : 0 %> lessons</span>
+                    <span class="ms-auto text-muted small me-3"><%= mod.lessons ? mod.lessons.length : 0 %> টি ক্লাস</span>
                   </button>
                 </h2>
                 <div
@@ -123,7 +150,7 @@
                               <i class="fa-regular fa-circle-play text-primary me-2"></i>
                               <span><%= lesson %></span>
                             </div>
-                            <span class="badge bg-light text-secondary border">Video</span>
+                            <span class="badge bg-light text-secondary border">ভিডিও ক্লাস</span>
                           </li>
                         <% }); %>
                       <% } %>
@@ -132,25 +159,23 @@
                 </div>
               </div>
             <% }); %>
-          <% } else { %>
-            <div class="p-4 bg-white text-muted">Curriculum details available upon enrollment.</div>
           <% } %>
         </div>
       </section>
 
       <!-- Requirements & Target Audience -->
-      <section class="card p-4 border rounded-4 shadow-sm mb-5">
-        <h4 class="fw-bold mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i>Requirements</h4>
+      <section class="card p-4 border rounded-4 shadow-sm mb-4 mb-md-5">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-list-check text-primary me-2"></i>কোর্সের জন্য কী প্রয়োজন?</h4>
         <ul class="mb-0 text-secondary ps-3">
-          <li class="mb-2">A computer (Windows, Mac, or Linux) with internet access.</li>
-          <li class="mb-2">No prior advanced experience required; we guide you step-by-step from foundations to advanced topics.</li>
-          <li>Enthusiasm and commitment to build real applications!</li>
+          <li class="mb-2">একটি কম্পিউটার বা ল্যাপটপ (Windows, Mac বা Linux) এবং ইন্টারনেট কানেকশন।</li>
+          <li class="mb-2">পূর্বে কোনো অ্যাডভান্সড কোডিং অভিজ্ঞতার প্রয়োজন নেই; শূন্য থেকেই ধাপে ধাপে শেখানো হবে।</li>
+          <li>নিয়মিত প্র্যাকটিস ও অ্যাসাইনমেন্ট সম্পন্ন করার মানসিকতা।</li>
         </ul>
       </section>
     </div>
 
-    <!-- Sticky Sidebar Purchase Box -->
-    <div class="col-lg-4">
+    <!-- Desktop Sticky Sidebar Purchase Box -->
+    <div class="col-lg-4 d-none d-lg-block">
       <div class="enroll-card-sticky">
         <div class="position-relative">
           <img
@@ -163,19 +188,19 @@
         </div>
 
         <div class="p-4">
-          <!-- Pricing -->
+          <!-- Bangladesh Pricing -->
           <div class="d-flex align-items-baseline gap-2 mb-2">
-            <span class="display-6 fw-bold text-success">$<%= course.price %></span>
+            <span class="display-6 fw-bold text-success">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
             <% if (course.originalPrice && course.originalPrice > course.price) { %>
-              <span class="text-decoration-line-through text-muted fs-5">$<%= course.originalPrice %></span>
+              <span class="text-decoration-line-through text-muted fs-5">৳<%= Number(course.originalPrice).toLocaleString('en-IN') %></span>
               <span class="badge bg-danger ms-auto">
-                Save <%= Math.round((1 - course.price / course.originalPrice) * 100) %>%
+                <%= Math.round((1 - course.price / course.originalPrice) * 100) %>% ছাড়
               </span>
             <% } %>
           </div>
 
           <div class="text-danger small fw-semibold mb-3">
-            <i class="fa-solid fa-hourglass-half me-1"></i> Special introductory price ends soon!
+            <i class="fa-solid fa-hourglass-half me-1"></i> ডিসকাউন্ট অফার সীমিত সময়ের জন্য!
           </div>
 
           <!-- CTA Buttons -->
@@ -184,34 +209,33 @@
             class="btn btn-primary-custom btn-lg w-100 mb-2 py-3 fw-bold"
             onclick="openEnrollModal(<%= course.id %>, '<%= course.title.replace(/'/g, "\\'") %>', <%= course.price %>)"
           >
-            <i class="fa-solid fa-cart-shopping me-2"></i> Enroll in Course
+            <i class="fa-solid fa-cart-shopping me-2"></i> এখনই এনরোল করুন
           </button>
           
           <div class="text-center small text-muted mb-4">
-            <i class="fa-solid fa-shield-halved text-success me-1"></i> 30-Day Money-Back Guarantee
+            <i class="fa-solid fa-shield-halved text-success me-1"></i> বিকাশ, নগদ ও কার্ড সাপোর্টেড
           </div>
 
           <!-- Course Features Checklist -->
           <div class="border-top pt-3">
-            <h6 class="fw-bold mb-3">This course includes:</h6>
+            <h6 class="fw-bold mb-3">কোর্সের সাথে যা যা পাচ্ছেন:</h6>
             <ul class="list-unstyled small text-secondary mb-0">
-              <li class="mb-2"><i class="fa-solid fa-video text-primary me-2"></i> <%= course.duration %> on-demand video</li>
-              <li class="mb-2"><i class="fa-solid fa-file-code text-primary me-2"></i> Real-world portfolio projects</li>
-              <li class="mb-2"><i class="fa-solid fa-infinity text-primary me-2"></i> Full lifetime access</li>
-              <li class="mb-2"><i class="fa-solid fa-mobile-screen text-primary me-2"></i> Access on mobile, tablet & desktop</li>
-              <li class="mb-2"><i class="fa-solid fa-certificate text-primary me-2"></i> Certificate of Completion</li>
-              <li><i class="fa-solid fa-comments text-primary me-2"></i> Instructor Q&A community access</li>
+              <li class="mb-2"><i class="fa-solid fa-video text-primary me-2"></i> <%= course.duration %> পূর্ণাঙ্গ ভিডিও লেকচার</li>
+              <li class="mb-2"><i class="fa-solid fa-file-code text-primary me-2"></i> পোর্টফোলিও মানের লাইভ প্রজেক্ট</li>
+              <li class="mb-2"><i class="fa-solid fa-infinity text-primary me-2"></i> লাইফটাইম অ্যাক্সেস ও আপডেট</li>
+              <li class="mb-2"><i class="fa-solid fa-certificate text-primary me-2"></i> কোর্স কমপ্লিশন ভেরিফাইড সার্টিফিকেট</li>
+              <li><i class="fa-solid fa-comments text-primary me-2"></i> ডেডিকেটেড ডিসকর্ড/টেলিগ্রাম সাপোর্ট গ্রুপ</li>
             </ul>
           </div>
 
           <!-- Management Actions -->
           <div class="border-top mt-4 pt-3 d-flex justify-content-between">
             <a href="/courses/edit/<%= course.id %>" class="btn btn-sm btn-outline-secondary">
-              <i class="fa-solid fa-pen me-1"></i> Edit Course
+              <i class="fa-solid fa-pen me-1"></i> এডিট
             </a>
-            <form action="/courses/delete/<%= course.id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this course?');">
+            <form action="/courses/delete/<%= course.id %>" method="POST" onsubmit="return confirm('আপনি কি এই কোর্সটি মুছে ফেলতে চান?');">
               <button type="submit" class="btn btn-sm btn-outline-danger">
-                <i class="fa-solid fa-trash me-1"></i> Delete
+                <i class="fa-solid fa-trash me-1"></i> ডিলিট
               </button>
             </form>
           </div>
@@ -221,61 +245,176 @@
   </div>
 </main>
 
-<!-- Quick Enroll Modal -->
+<!-- Mobile Sticky Bottom Floating Purchase Bar -->
+<div class="d-lg-none fixed-bottom bg-white border-top shadow-lg p-2.5 px-3 d-flex align-items-center justify-content-between" style="z-index: 1030;">
+  <div>
+    <small class="text-muted d-block lh-1">কোর্স ফি</small>
+    <span class="fw-bold fs-5 text-success">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
+  </div>
+  <button
+    type="button"
+    class="btn btn-primary-custom px-4 py-2 fw-bold"
+    onclick="openEnrollModal(<%= course.id %>, '<%= course.title.replace(/'/g, "\\'") %>', <%= course.price %>)"
+  >
+    <i class="fa-solid fa-cart-shopping me-1"></i> এনরোল করুন
+  </button>
+</div>
+
+<!-- Reactive Bangladesh Checkout & Enrollment Modal -->
 <div class="modal fade" id="enrollModal" tabindex="-1" aria-labelledby="enrollModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <div class="modal-header bg-dark-navy text-white border-0 py-3">
-        <h5 class="modal-title fw-bold" id="enrollModalLabel">
-          <i class="fa-solid fa-cart-shopping me-2 text-warning"></i> Complete Your Enrollment
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form action="/courses/enroll" method="POST">
-        <input type="hidden" id="modalCourseId" name="courseId" value="<%= course.id %>" />
-        <div class="modal-body p-4">
-          <div class="p-3 bg-light rounded-3 mb-3 border">
-            <div class="small text-muted">Selected Course:</div>
-            <h6 class="fw-bold mb-1 text-primary" id="modalCourseTitle"><%= course.title %></h6>
-            <div class="d-flex justify-content-between align-items-center mt-2">
-              <span class="text-muted small">Total Investment:</span>
-              <span class="fw-bold fs-5 text-success" id="modalCoursePrice">$<%= course.price %></span>
-            </div>
-          </div>
-
-          <div class="mb-3">
-            <label for="studentName" class="form-label fw-bold">Full Name <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="studentName" name="studentName" placeholder="Enter your full name" required />
-          </div>
-
-          <div class="mb-3">
-            <label for="studentEmail" class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="studentEmail" name="studentEmail" placeholder="you@example.com" required />
-            <small class="text-muted">Your course access link and receipt will be delivered here.</small>
-          </div>
-
-          <div class="mb-3">
-            <label for="studentPhone" class="form-label fw-bold">Phone Number (optional)</label>
-            <input type="text" class="form-control" id="studentPhone" name="studentPhone" placeholder="+1 (555) 000-0000" />
-          </div>
-
-          <div class="mb-3">
-            <label for="paymentMethod" class="form-label fw-bold">Payment Method</label>
-            <select class="form-select" id="paymentMethod" name="paymentMethod">
-              <option value="Credit / Debit Card">Credit / Debit Card (Stripe)</option>
-              <option value="PayPal">PayPal</option>
-              <option value="Mobile Banking">Mobile Banking (bKash / Nagad / Rocket)</option>
-            </select>
-          </div>
-
-          <div class="p-2 bg-success bg-opacity-10 rounded-2 text-success small">
-            <i class="fa-solid fa-shield-check me-1"></i> 30-Day 100% Money-Back Satisfaction Guarantee.
+      <!-- Modal Header -->
+      <div class="modal-header bg-dark-navy text-white border-0 py-3 px-4">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-warning fs-5"></i>
+          <div>
+            <h5 class="modal-title fw-bold mb-0" id="enrollModalLabel">কোর্স এনরোলমেন্ট ও পেমেন্ট</h5>
+            <small class="text-white-50">ইনস্ট্যান্ট অ্যাক্সেস ও নিশ্চিত ভেরিফিকেশন</small>
           </div>
         </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form action="/courses/enroll" method="POST" id="reactiveEnrollForm" onsubmit="return handleEnrollSubmit(event)">
+        <input type="hidden" id="modalCourseId" name="courseId" value="<%= course.id %>" />
+        <input type="hidden" id="modalCoursePriceInput" name="coursePrice" value="<%= course.price %>" />
+
+        <div class="modal-body p-4">
+          <div class="row g-4">
+            <!-- Left Column: Student Details -->
+            <div class="col-md-6 border-end-md">
+              <h6 class="fw-bold text-dark mb-3">
+                <i class="fa-solid fa-user-graduate text-primary me-2"></i>১. শিক্ষার্থীর তথ্য
+              </h6>
+
+              <div class="mb-3">
+                <label for="studentName" class="form-label small fw-bold">আপনার পূর্ণ নাম <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="studentName" name="studentName" placeholder="e.g. তানভীর আহমেদ" required />
+              </div>
+
+              <div class="mb-3">
+                <label for="studentEmail" class="form-label small fw-bold">ইমেইল অ্যাড্রেস <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="studentEmail" name="studentEmail" placeholder="you@example.com" required />
+                <div class="form-text small">কোর্সের লগইন ও ক্লাসরুম লিঙ্ক এই ইমেইলে যাবে।</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="studentPhone" class="form-label small fw-bold">মোবাইল নম্বর <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light text-muted small">+88</span>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="studentPhone"
+                    name="studentPhone"
+                    placeholder="017XXXXXXXX"
+                    pattern="[0-9]{11}"
+                    title="১১ ডিজিটের সঠিক মোবাইল নম্বর দিন"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Course Summary & Payment Method -->
+            <div class="col-md-6">
+              <h6 class="fw-bold text-dark mb-3">
+                <i class="fa-solid fa-credit-card text-success me-2"></i>২. পেমেন্ট ও সামারি
+              </h6>
+
+              <!-- Selected Course Card -->
+              <div class="p-3 bg-light rounded-3 mb-3 border">
+                <div class="small text-muted">নির্বাচিত কোর্স:</div>
+                <h6 class="fw-bold mb-1 text-primary text-truncate" id="modalCourseTitle"><%= course.title %></h6>
+                <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                  <span class="text-muted small">মোট প্রদেয় ফি:</span>
+                  <span class="fw-bold fs-4 text-success" id="modalCoursePrice">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
+                </div>
+              </div>
+
+              <!-- Payment Method Selection -->
+              <div class="mb-3">
+                <label class="form-label small fw-bold">পেমেন্ট মেথড নির্বাচন করুন</label>
+                <div class="d-flex flex-wrap gap-2 mb-2" id="paymentMethodSelector">
+                  <button type="button" class="btn btn-sm btn-outline-primary active flex-fill py-2 pay-opt-btn" onclick="selectPaymentMethod('bKash', this)">
+                    <i class="fa-solid fa-mobile-screen me-1 text-danger"></i> বিকাশ (bKash)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-primary flex-fill py-2 pay-opt-btn" onclick="selectPaymentMethod('Nagad', this)">
+                    <i class="fa-solid fa-wallet me-1 text-warning"></i> নগদ (Nagad)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-primary flex-fill py-2 pay-opt-btn" onclick="selectPaymentMethod('Card', this)">
+                    <i class="fa-solid fa-credit-card me-1 text-info"></i> কার্ড / অন্যান্য
+                  </button>
+                </div>
+                <input type="hidden" id="selectedPaymentMethod" name="paymentMethod" value="bKash" />
+              </div>
+
+              <!-- Reactive Payment Instructions Box -->
+              <div id="paymentInstructionsBox" class="p-3 rounded-3 border bg-light mb-3">
+                <!-- bKash instructions -->
+                <div id="instrBkash">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge bg-danger">bKash Personal / Send Money</span>
+                    <strong class="text-dark font-monospace user-select-all" id="bkashNumber">01712-345678</strong>
+                  </div>
+                  <ol class="small text-secondary ps-3 mb-2">
+                    <li>বিকাশ অ্যাপ ওপেন করে <strong>Send Money</strong> সিলেক্ট করুন।</li>
+                    <li>নম্বর দিন: <strong>01712-345678</strong> এবং কোর্স ফি সেন্ড করুন।</li>
+                    <li>পেমেন্ট সফল হলে প্রাপ্ত <strong>Transaction ID (TrxID)</strong> নিচে লিখুন।</li>
+                  </ol>
+                </div>
+
+                <!-- Nagad instructions -->
+                <div id="instrNagad" class="d-none">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge bg-warning text-dark">Nagad Personal / Send Money</span>
+                    <strong class="text-dark font-monospace user-select-all">01898-765432</strong>
+                  </div>
+                  <ol class="small text-secondary ps-3 mb-2">
+                    <li>নগদ অ্যাপে ঢুকে <strong>Send Money</strong> অপশন বেছে নিন।</li>
+                    <li>নম্বর: <strong>01898-765432</strong> এ কোর্স ফি প্রদান করুন।</li>
+                    <li>এসএমএস বা রিসিট থেকে <strong>TrxID</strong> নিচে এন্টার করুন।</li>
+                  </ol>
+                </div>
+
+                <!-- Card instructions -->
+                <div id="instrCard" class="d-none">
+                  <div class="small text-secondary mb-2">
+                    <i class="fa-solid fa-shield-check text-success me-1"></i> Visa, Mastercard, DBBL Nexus ও যেকোনো ব্যাংকের কার্ড সাপোর্টেড।
+                  </div>
+                  <small class="text-muted">এনরোল কনফার্ম করার পর সিকিউরড পেমেন্ট গেটওয়ে পেজে রিডাইরেক্ট হবে।</small>
+                </div>
+              </div>
+
+              <!-- Transaction ID Input (for bKash / Nagad) -->
+              <div class="mb-3" id="trxIdContainer">
+                <label for="trxId" class="form-label small fw-bold">
+                  বিকাশ / নগদ ট্রানজেকশন আইডি (TrxID) <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control font-monospace"
+                  id="trxId"
+                  name="trxId"
+                  placeholder="e.g. 9J7K2L8M1N"
+                  required
+                />
+              </div>
+
+              <!-- Guarantee Badge -->
+              <div class="p-2 bg-success bg-opacity-10 rounded-2 text-success small text-center">
+                <i class="fa-solid fa-badge-check me-1"></i> ১০০% মানিব্যাক গ্যারান্টি &bull; ৭ দিনের ট্রায়াল সুবিধা
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
         <div class="modal-footer border-0 pt-0 pb-4 px-4">
-          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary-custom btn-lg w-100 mt-2">
-            <i class="fa-solid fa-lock me-2"></i> Confirm Enrollment & Pay ($<%= course.price %>)
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">বাতিল</button>
+          <button type="submit" class="btn btn-primary-custom btn-lg flex-grow-1" id="btnSubmitEnroll">
+            <i class="fa-solid fa-lock me-1"></i> এনরোলমেন্ট কনফার্ম করুন (৳<%= Number(course.price).toLocaleString('en-IN') %>)
           </button>
         </div>
       </form>
@@ -284,12 +423,46 @@
 </div>
 
 <script>
+  function selectPaymentMethod(method, btn) {
+    document.getElementById('selectedPaymentMethod').value = method;
+    document.querySelectorAll('.pay-opt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const instrBkash = document.getElementById('instrBkash');
+    const instrNagad = document.getElementById('instrNagad');
+    const instrCard = document.getElementById('instrCard');
+    const trxContainer = document.getElementById('trxIdContainer');
+    const trxInput = document.getElementById('trxId');
+
+    instrBkash.classList.add('d-none');
+    instrNagad.classList.add('d-none');
+    instrCard.classList.add('d-none');
+
+    if (method === 'bKash') {
+      instrBkash.classList.remove('d-none');
+      trxContainer.classList.remove('d-none');
+      trxInput.required = true;
+    } else if (method === 'Nagad') {
+      instrNagad.classList.remove('d-none');
+      trxContainer.classList.remove('d-none');
+      trxInput.required = true;
+    } else {
+      instrCard.classList.remove('d-none');
+      trxContainer.classList.add('d-none');
+      trxInput.required = false;
+    }
+  }
+
   function openEnrollModal(courseId, title, price) {
-    document.getElementById('modalCourseId').value = courseId;
-    document.getElementById('modalCourseTitle').textContent = title;
-    document.getElementById('modalCoursePrice').textContent = '$' + price;
     const modal = new bootstrap.Modal(document.getElementById('enrollModal'));
     modal.show();
+  }
+
+  function handleEnrollSubmit(e) {
+    const btn = document.getElementById('btnSubmitEnroll');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>এনরোলমেন্ট প্রসেসিং হচ্ছে...`;
+    return true;
   }
 </script>
 

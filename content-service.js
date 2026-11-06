@@ -749,8 +749,10 @@ module.exports = {
           studentName: enrollmentData.studentName || "Student",
           studentEmail: enrollmentData.studentEmail || "student@example.com",
           studentPhone: enrollmentData.studentPhone || "",
-          paymentMethod: enrollmentData.paymentMethod || "Credit / Debit Card",
+          paymentMethod: enrollmentData.paymentMethod || "bKash",
+          trxId: enrollmentData.trxId || "TRX" + Math.floor(100000 + Math.random() * 900000),
           amountPaid: course.price,
+          currency: "৳",
           enrollmentDate: new Date().toISOString().split("T")[0],
           status: "Confirmed",
         };

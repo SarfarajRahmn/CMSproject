@@ -117,13 +117,13 @@
                 </div>
                 <div class="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
                   <div>
-                    <span class="price-tag">$<%= course.price %></span>
+                    <span class="price-tag fs-4 fw-bold text-success">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
                     <% if (course.originalPrice && course.originalPrice > course.price) { %>
-                      <span class="original-price-tag">$<%= course.originalPrice %></span>
+                      <span class="original-price-tag text-muted text-decoration-line-through small ms-1">৳<%= Number(course.originalPrice).toLocaleString('en-IN') %></span>
                     <% } %>
                   </div>
                   <a href="/courses/<%= course.id %>" class="btn btn-primary-custom btn-sm">
-                    View Course
+                    কোর্স দেখুন
                   </a>
                 </div>
               </div>
