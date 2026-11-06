@@ -37,6 +37,33 @@ app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// Singleton initialization for serverless / Vercel compatibility
+let initPromise = null;
+function ensureInitialized() {
+  if (!initPromise) {
+    initPromise = contentService
+      .initialize()
+      .then(() => {
+        console.log("Content service initialized successfully.");
+      })
+      .catch((err) => {
+        console.error("Failed to initialize content service:", err);
+        throw err;
+      });
+  }
+  return initPromise;
+}
+
+// Middleware to ensure data service is ready before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await ensureInitialized();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
 /**
  * Helper to determine if the client expects a JSON response
  */
@@ -69,288 +96,294 @@ function uploadToCloudinary(fileBuffer) {
   });
 }
 
-// Initialize Content Service before setting up route handlers
-contentService
-  .initialize()
-  .then(() => {
-    console.log("Content service initialized successfully.");
+// -----------------------------------------------------------------------------
+// Routes
+// -----------------------------------------------------------------------------
 
-    // Home Route
-    app.get("/", async (req, res) => {
-      try {
-        const [articles, categories] = await Promise.all([
-          contentService.getAllArticles().catch(() => []),
-          contentService.getCategories().catch(() => []),
-        ]);
-        res.render("home", { articles, categories, page: "home" });
-      } catch (err) {
-        res.render("home", { articles: [], categories: [], page: "home" });
-      }
-    });
+// Home Route
+app.get("/", async (req, res) => {
+  try {
+    const [articles, categories] = await Promise.all([
+      contentService.getAllArticles().catch(() => []),
+      contentService.getCategories().catch(() => []),
+    ]);
+    res.render("home", { articles, categories, page: "home" });
+  } catch (err) {
+    res.render("home", { articles: [], categories: [], page: "home" });
+  }
+});
 
-    // About Route
-    app.get("/about", (req, res) => {
-      res.render("about", { page: "about" });
-    });
+// About Route
+app.get("/about", (req, res) => {
+  res.render("about", { page: "about" });
+});
 
-    // Display Add Article Form
-    app.get("/articles/add", async (req, res) => {
-      try {
-        const categories = await contentService.getCategories().catch(() => []);
-        res.render("addArticle", { categories, page: "addArticle" });
-      } catch (err) {
-        res.render("addArticle", { categories: [], page: "addArticle" });
-      }
-    });
+// Display Add Article Form
+app.get("/articles/add", async (req, res) => {
+  try {
+    const categories = await contentService.getCategories().catch(() => []);
+    res.render("addArticle", { categories, page: "addArticle" });
+  } catch (err) {
+    res.render("addArticle", { categories: [], page: "addArticle" });
+  }
+});
 
-    // Handle Adding New Article
-    app.post(
-      "/articles/add",
-      upload.single("featureImage"),
-      async (req, res) => {
+// Handle Adding New Article
+app.post(
+  "/articles/add",
+  upload.single("featureImage"),
+  async (req, res) => {
+    try {
+      let imageUrl = "/images/CONTENT.png";
+
+      if (req.file) {
         try {
-          let imageUrl = "/images/CONTENT.png";
-
-          if (req.file) {
-            try {
-              imageUrl = await uploadToCloudinary(req.file.buffer);
-            } catch (uploadErr) {
-              console.warn("Cloudinary upload failed, using fallback image:", uploadErr.message);
-            }
-          }
-
-          req.body.featureImage = imageUrl;
-          await contentService.addArticle(req.body);
-
-          res.redirect("/articles");
-        } catch (error) {
-          console.error("Error creating article:", error);
-          if (expectsJson(req)) {
-            res.status(500).json({ message: "Article creation failed", error: error.message });
-          } else {
-            res.status(500).render("404", { title: "Error creating article" });
-          }
+          imageUrl = await uploadToCloudinary(req.file.buffer);
+        } catch (uploadErr) {
+          console.warn("Cloudinary upload failed, using fallback image:", uploadErr.message);
         }
       }
-    );
 
-    // List Articles (supports category filter, minDate filter, and dual JSON/HTML format)
-    app.get("/articles", async (req, res) => {
-      const { category, minDate } = req.query;
+      req.body.featureImage = imageUrl;
+      await contentService.addArticle(req.body);
 
-      try {
-        let articlesPromise;
-        if (category) {
-          articlesPromise = contentService.getArticlesByCategory(category);
-        } else if (minDate) {
-          articlesPromise = contentService.getArticlesByMinDate(minDate);
-        } else {
-          articlesPromise = contentService.getAllArticles();
-        }
-
-        const [articles, categories] = await Promise.all([
-          articlesPromise.catch(() => []),
-          contentService.getCategories().catch(() => []),
-        ]);
-
-        if (expectsJson(req)) {
-          return res.json(articles);
-        }
-
-        res.render("articles", {
-          articles,
-          categories,
-          selectedCategory: category || "",
-          page: "articles",
-          error: null,
-        });
-      } catch (err) {
-        if (expectsJson(req)) {
-          return res.status(500).json({ message: "Error fetching articles", error: err.message });
-        }
-        res.render("articles", {
-          articles: [],
-          categories: [],
-          selectedCategory: "",
-          page: "articles",
-          error: "Error retrieving articles.",
-        });
-      }
-    });
-
-    // Display / Retrieve Single Article by ID
-    app.get("/articles/:id", async (req, res) => {
-      const articleId = req.params.id;
-
-      try {
-        const article = await contentService.getArticleById(articleId);
-
-        if (expectsJson(req)) {
-          return res.json(article);
-        }
-
-        res.render("article", { article, page: "articles" });
-      } catch (err) {
-        if (expectsJson(req)) {
-          return res.status(404).json({ message: "Article not found", error: err.message || err });
-        }
-        res.status(404).render("article", { article: null, page: "articles" });
-      }
-    });
-
-    // Display Edit Article Form
-    app.get("/articles/edit/:id", async (req, res) => {
-      const articleId = req.params.id;
-
-      try {
-        const [article, categories] = await Promise.all([
-          contentService.getArticleById(articleId),
-          contentService.getCategories().catch(() => []),
-        ]);
-        res.render("editArticle", { article, categories, page: "articles" });
-      } catch (err) {
-        res.status(404).render("404", { title: "Article not found" });
-      }
-    });
-
-    // Handle Updating an Article
-    app.post(
-      "/articles/edit/:id",
-      upload.single("featureImage"),
-      async (req, res) => {
-        const articleId = req.params.id;
-
-        try {
-          let imageUrl = req.body.existingImage || "";
-
-          if (req.file) {
-            try {
-              imageUrl = await uploadToCloudinary(req.file.buffer);
-            } catch (uploadErr) {
-              console.warn("Cloudinary upload failed on update:", uploadErr.message);
-            }
-          }
-
-          if (imageUrl) {
-            req.body.featureImage = imageUrl;
-          }
-
-          await contentService.updateArticle(articleId, req.body);
-          res.redirect(`/articles/${articleId}`);
-        } catch (err) {
-          console.error("Error updating article:", err);
-          res.status(500).redirect(`/articles/${articleId}`);
-        }
-      }
-    );
-
-    // Handle Article Deletion (Supports POST and GET for simple links)
-    app.post("/articles/delete/:id", async (req, res) => {
-      try {
-        await contentService.deleteArticle(req.params.id);
-        res.redirect("/articles");
-      } catch (err) {
-        console.error("Error deleting article:", err);
-        res.status(500).redirect("/articles");
-      }
-    });
-
-    app.get("/articles/delete/:id", async (req, res) => {
-      try {
-        await contentService.deleteArticle(req.params.id);
-        res.redirect("/articles");
-      } catch (err) {
-        res.status(500).redirect("/articles");
-      }
-    });
-
-    // Categories Route (Supports dual JSON and HTML format)
-    app.get("/categories", async (req, res) => {
-      try {
-        const categories = await contentService.getCategories();
-        if (expectsJson(req)) {
-          return res.json(categories);
-        }
-        res.render("categories", { categories, page: "categories", error: null });
-      } catch (err) {
-        if (expectsJson(req)) {
-          return res.status(500).json({ message: "Internal Server Error", error: err.message });
-        }
-        res.render("categories", { categories: [], page: "categories", error: "Could not load categories." });
-      }
-    });
-
-    // Add New Category
-    app.post("/categories/add", async (req, res) => {
-      try {
-        await contentService.addCategory(req.body);
-        res.redirect("/categories");
-      } catch (err) {
-        console.error("Error adding category:", err);
-        res.redirect("/categories");
-      }
-    });
-
-    // Dedicated REST API Endpoints
-    app.get("/api/articles", async (req, res) => {
-      const { category, minDate } = req.query;
-      try {
-        let data;
-        if (category) data = await contentService.getArticlesByCategory(category);
-        else if (minDate) data = await contentService.getArticlesByMinDate(minDate);
-        else data = await contentService.getAllArticles();
-        res.json(data);
-      } catch (err) {
-        res.status(404).json({ message: err.message });
-      }
-    });
-
-    app.get("/api/articles/published", async (req, res) => {
-      try {
-        const articles = await contentService.getPublishedArticles();
-        res.json(articles);
-      } catch (err) {
-        res.status(404).json({ message: err.message });
-      }
-    });
-
-    app.get("/api/articles/:id", async (req, res) => {
-      try {
-        const article = await contentService.getArticleById(req.params.id);
-        res.json(article);
-      } catch (err) {
-        res.status(404).json({ message: err.message || "Article not found" });
-      }
-    });
-
-    app.get("/api/categories", async (req, res) => {
-      try {
-        const categories = await contentService.getCategories();
-        res.json(categories);
-      } catch (err) {
-        res.status(500).json({ message: err.message });
-      }
-    });
-
-    // 404 Route Handler for unmatched paths
-    app.use((req, res) => {
+      res.redirect("/articles");
+    } catch (error) {
+      console.error("Error creating article:", error);
       if (expectsJson(req)) {
-        res.status(404).json({ message: "404 Not Found" });
+        res.status(500).json({ message: "Article creation failed", error: error.message });
       } else {
-        res.status(404).render("404", { title: "404 Not Found" });
+        res.status(500).render("404", { title: "Error creating article" });
       }
-    });
-
-    // Start server if not running in serverless wrapper
-    if (process.env.NODE_ENV !== "test") {
-      app.listen(PORT, () => {
-        console.log(`Express HTTP server listening on port ${PORT} (http://localhost:${PORT})`);
-      });
     }
-  })
-  .catch((err) => {
-    console.error("Failed to initialize content service:", err);
+  }
+);
+
+// List Articles (supports category filter, minDate filter, and dual JSON/HTML format)
+app.get("/articles", async (req, res) => {
+  const { category, minDate } = req.query;
+
+  try {
+    let articlesPromise;
+    if (category) {
+      articlesPromise = contentService.getArticlesByCategory(category);
+    } else if (minDate) {
+      articlesPromise = contentService.getArticlesByMinDate(minDate);
+    } else {
+      articlesPromise = contentService.getAllArticles();
+    }
+
+    const [articles, categories] = await Promise.all([
+      articlesPromise.catch(() => []),
+      contentService.getCategories().catch(() => []),
+    ]);
+
+    if (expectsJson(req)) {
+      return res.json(articles);
+    }
+
+    res.render("articles", {
+      articles,
+      categories,
+      selectedCategory: category || "",
+      page: "articles",
+      error: null,
+    });
+  } catch (err) {
+    if (expectsJson(req)) {
+      return res.status(500).json({ message: "Error fetching articles", error: err.message });
+    }
+    res.render("articles", {
+      articles: [],
+      categories: [],
+      selectedCategory: "",
+      page: "articles",
+      error: "Error retrieving articles.",
+    });
+  }
+});
+
+// Display / Retrieve Single Article by ID
+app.get("/articles/:id", async (req, res) => {
+  const articleId = req.params.id;
+
+  try {
+    const article = await contentService.getArticleById(articleId);
+
+    if (expectsJson(req)) {
+      return res.json(article);
+    }
+
+    res.render("article", { article, page: "articles" });
+  } catch (err) {
+    if (expectsJson(req)) {
+      return res.status(404).json({ message: "Article not found", error: err.message || err });
+    }
+    res.status(404).render("article", { article: null, page: "articles" });
+  }
+});
+
+// Display Edit Article Form
+app.get("/articles/edit/:id", async (req, res) => {
+  const articleId = req.params.id;
+
+  try {
+    const [article, categories] = await Promise.all([
+      contentService.getArticleById(articleId),
+      contentService.getCategories().catch(() => []),
+    ]);
+    res.render("editArticle", { article, categories, page: "articles" });
+  } catch (err) {
+    res.status(404).render("404", { title: "Article not found" });
+  }
+});
+
+// Handle Updating an Article
+app.post(
+  "/articles/edit/:id",
+  upload.single("featureImage"),
+  async (req, res) => {
+    const articleId = req.params.id;
+
+    try {
+      let imageUrl = req.body.existingImage || "";
+
+      if (req.file) {
+        try {
+          imageUrl = await uploadToCloudinary(req.file.buffer);
+        } catch (uploadErr) {
+          console.warn("Cloudinary upload failed on update:", uploadErr.message);
+        }
+      }
+
+      if (imageUrl) {
+        req.body.featureImage = imageUrl;
+      }
+
+      await contentService.updateArticle(articleId, req.body);
+      res.redirect(`/articles/${articleId}`);
+    } catch (err) {
+      console.error("Error updating article:", err);
+      res.status(500).redirect(`/articles/${articleId}`);
+    }
+  }
+);
+
+// Handle Article Deletion (Supports POST and GET for simple links)
+app.post("/articles/delete/:id", async (req, res) => {
+  try {
+    await contentService.deleteArticle(req.params.id);
+    res.redirect("/articles");
+  } catch (err) {
+    console.error("Error deleting article:", err);
+    res.status(500).redirect("/articles");
+  }
+});
+
+app.get("/articles/delete/:id", async (req, res) => {
+  try {
+    await contentService.deleteArticle(req.params.id);
+    res.redirect("/articles");
+  } catch (err) {
+    res.status(500).redirect("/articles");
+  }
+});
+
+// Categories Route (Supports dual JSON and HTML format)
+app.get("/categories", async (req, res) => {
+  try {
+    const categories = await contentService.getCategories();
+    if (expectsJson(req)) {
+      return res.json(categories);
+    }
+    res.render("categories", { categories, page: "categories", error: null });
+  } catch (err) {
+    if (expectsJson(req)) {
+      return res.status(500).json({ message: "Internal Server Error", error: err.message });
+    }
+    res.render("categories", { categories: [], page: "categories", error: "Could not load categories." });
+  }
+});
+
+// Add New Category
+app.post("/categories/add", async (req, res) => {
+  try {
+    await contentService.addCategory(req.body);
+    res.redirect("/categories");
+  } catch (err) {
+    console.error("Error adding category:", err);
+    res.redirect("/categories");
+  }
+});
+
+// Dedicated REST API Endpoints
+app.get("/api/articles", async (req, res) => {
+  const { category, minDate } = req.query;
+  try {
+    let data;
+    if (category) data = await contentService.getArticlesByCategory(category);
+    else if (minDate) data = await contentService.getArticlesByMinDate(minDate);
+    else data = await contentService.getAllArticles();
+    res.json(data);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+});
+
+app.get("/api/articles/published", async (req, res) => {
+  try {
+    const articles = await contentService.getPublishedArticles();
+    res.json(articles);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+});
+
+app.get("/api/articles/:id", async (req, res) => {
+  try {
+    const article = await contentService.getArticleById(req.params.id);
+    res.json(article);
+  } catch (err) {
+    res.status(404).json({ message: err.message || "Article not found" });
+  }
+});
+
+app.get("/api/categories", async (req, res) => {
+  try {
+    const categories = await contentService.getCategories();
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// 404 Route Handler for unmatched paths
+app.use((req, res) => {
+  if (expectsJson(req)) {
+    res.status(404).json({ message: "404 Not Found" });
+  } else {
+    res.status(404).render("404", { title: "404 Not Found" });
+  }
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  if (expectsJson(req)) {
+    res.status(500).json({ message: "Internal Server Error", error: err.message });
+  } else {
+    res.status(500).render("404", { title: "500 - Server Error" });
+  }
+});
+
+// Only start the HTTP listener when NOT running in a Vercel serverless environment
+if (!process.env.VERCEL && process.env.NODE_ENV !== "test") {
+  ensureInitialized().then(() => {
+    app.listen(PORT, () => {
+      console.log(`Express HTTP server listening on port ${PORT} (http://localhost:${PORT})`);
+    });
   });
+}
 
 // Export app for serverless platforms like Vercel
 module.exports = app;
