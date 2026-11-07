@@ -17,7 +17,7 @@
           </a>
         </div>
 
-        <form action="/articles/edit/<%= article.id %>" method="POST" enctype="multipart/form-data">
+        <form action="/articles/edit/<%= article.id %>" method="POST" enctype="multipart/form-data" onsubmit="const btn = document.getElementById('btnSubmitEditArticle'); btn.disabled = true; btn.innerHTML = '<span class=\'spinner-border spinner-border-sm me-2\' role=\'status\'></span>Saving Changes...'; return true;">
           <!-- Title -->
           <div class="mb-3">
             <label for="title" class="form-label fw-bold">Article Title <span class="text-danger">*</span></label>
@@ -123,7 +123,7 @@
           <!-- Form Buttons -->
           <div class="d-flex justify-content-end gap-2">
             <a href="/articles/<%= article.id %>" class="btn btn-secondary-custom">Cancel</a>
-            <button type="submit" class="btn btn-primary-custom">
+            <button type="submit" class="btn btn-primary-custom" id="btnSubmitEditArticle">
               <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
             </button>
           </div>

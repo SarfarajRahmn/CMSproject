@@ -10,7 +10,7 @@
       </span>
       <h1 class="display-5 fw-bold mb-2">প্রজেক্ট-ভিত্তিক টেক কোর্সসমূহ</h1>
       <p class="lead text-muted mb-0">
-        আন্তর্জাতিক মানের কারিকুলাম ও বাস্তব প্রজেক্টের মাধ্যমে শিখুন ফুল-স্ট্যাক ওয়েব ডেভেলপমেন্ট, জেনারেটিভ এআই, ডকার/ডেভঅপ্স এবং ডাটাবেস আর্কিটেকচার।
+        বাংলাদেশি শিক্ষার্থীদের জন্য আন্তর্জাতিক মানের কারিকুলাম ও লাইভ সাপোর্ট। বিকাশ, নগদ ও রকেটে সহজে পেমেন্ট সুবিধা।
       </p>
     </div>
     <div class="col-lg-4 text-lg-end">
@@ -20,10 +20,11 @@
     </div>
   </div>
 
-  <!-- Search & Category Filters (Reactive Toolbar) -->
+  <!-- Search, Filter & Reactive Sorting Toolbar -->
   <div class="card p-3 border-0 shadow-sm rounded-4 mb-4">
     <div class="row g-3 align-items-center">
-      <div class="col-md-5">
+      <!-- Search Input with Clear Button -->
+      <div class="col-12 col-md-4">
         <div class="input-group">
           <span class="input-group-text bg-white border-end-0 text-muted">
             <i class="fa-solid fa-magnifying-glass"></i>
@@ -31,29 +32,53 @@
           <input
             type="text"
             id="courseSearchInput"
-            class="form-control border-start-0 ps-0"
-            placeholder="কোর্স বা স্কিল খুঁজুন (e.g. React, Python, Docker)..."
+            class="form-control border-start-0 border-end-0 ps-0"
+            placeholder="কোর্স খুঁজুন (e.g. React, Python, Docker)..."
             oninput="applyReactiveFilters()"
           />
+          <button
+            type="button"
+            class="btn btn-white bg-white border-start-0 text-muted d-none"
+            id="clearSearchBtn"
+            onclick="clearSearchInput()"
+            title="সার্চ মুছুন"
+          >
+            <i class="fa-solid fa-xmark"></i>
+          </button>
         </div>
       </div>
-      <div class="col-md-7">
-        <div class="d-flex flex-wrap gap-2 justify-content-md-end" id="categoryFilterPills">
+
+      <!-- Reactive Category Filter Pills (Mobile Horizontal Scroll) -->
+      <div class="col-12 col-md-5">
+        <div class="category-scroll-container" id="categoryFilterPills">
           <button type="button" class="btn btn-sm btn-primary-custom cat-filter-btn active" data-cat="all" onclick="selectCategoryFilter('all', this)">
-            সকল কোর্স
+            <i class="fa-solid fa-border-all"></i> সকল কোর্স
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary cat-filter-btn" data-cat="web" onclick="selectCategoryFilter('web', this)">
-            Web Dev
+            <i class="fa-solid fa-globe"></i> Web Dev
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary cat-filter-btn" data-cat="ai" onclick="selectCategoryFilter('ai', this)">
-            AI & ML
+            <i class="fa-solid fa-robot"></i> AI & ML
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary cat-filter-btn" data-cat="database" onclick="selectCategoryFilter('database', this)">
-            Databases
+            <i class="fa-solid fa-database"></i> Database
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary cat-filter-btn" data-cat="cloud" onclick="selectCategoryFilter('cloud', this)">
-            DevOps & Cloud
+            <i class="fa-solid fa-cloud"></i> DevOps
           </button>
+        </div>
+      </div>
+
+      <!-- Reactive Sort Dropdown -->
+      <div class="col-12 col-md-3 text-md-end">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light text-muted small"><i class="fa-solid fa-arrow-down-wide-short me-1"></i> সাজান:</span>
+          <select id="courseSortSelect" class="form-select" onchange="applyReactiveSorting()">
+            <option value="featured">জনপ্রিয় / ফিচারড</option>
+            <option value="price-asc">মূল্য: কম থেকে বেশি (৳)</option>
+            <option value="price-desc">মূল্য: বেশি থেকে কম (৳)</option>
+            <option value="rating-desc">সর্বোচ্চ রেটিং</option>
+          </select>
         </div>
       </div>
     </div>
@@ -63,6 +88,9 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div class="small text-muted fw-semibold">
       মোট কোর্স প্রদর্শিত হচ্ছে: <span id="visibleCoursesCount" class="text-primary fw-bold"><%= courses ? courses.length : 0 %></span> টি
+    </div>
+    <div class="small text-muted d-none d-md-block">
+      <i class="fa-solid fa-shield-halved text-success me-1"></i> ১০০% মানিব্যাক গ্যারান্টি &bull; লাইফটাইম অ্যাক্সেস
     </div>
   </div>
 
@@ -75,6 +103,9 @@
           data-title="<%= (course.title || '').toLowerCase() %>"
           data-subtitle="<%= (course.subtitle || '').toLowerCase() %>"
           data-category="<%= (course.category || '').toLowerCase() %>"
+          data-price="<%= course.price || 0 %>"
+          data-rating="<%= course.rating || 5.0 %>"
+          data-enrolled="<%= course.enrolledCount || 0 %>"
         >
           <div class="course-card h-100 d-flex flex-column">
             <!-- Thumbnail & Badge -->
@@ -83,7 +114,7 @@
                 src="<%= course.thumbnail || '/images/CONTENT.png' %>"
                 alt="<%= course.title %>"
                 class="img-fluid w-100"
-                style="height: 190px; object-fit: cover;"
+                style="height: 195px; object-fit: cover;"
                 onerror="this.src='/images/CONTENT.png'"
               />
               <% if (course.badge) { %>
@@ -141,6 +172,9 @@
                   <span class="price-tag fs-4 fw-bold text-success">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
                   <% if (course.originalPrice && course.originalPrice > course.price) { %>
                     <span class="original-price-tag small text-muted text-decoration-line-through">৳<%= Number(course.originalPrice).toLocaleString('en-IN') %></span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 ms-1 small">
+                      <%= Math.round((1 - course.price/course.originalPrice)*100) %>% ছাড়
+                    </span>
                   <% } %>
                 </div>
                 <div class="d-flex gap-2">
@@ -185,8 +219,8 @@
         <div class="d-flex align-items-center gap-2">
           <i class="fa-solid fa-shield-halved text-warning fs-5"></i>
           <div>
-            <h5 class="modal-title fw-bold mb-0" id="enrollModalLabel">কোর্স এনরোলমেন্ট ও পেমেন্ট</h5>
-            <small class="text-white-50">ইনস্ট্যান্ট অ্যাক্সেস ও নিশ্চিত ভেরিফিকেশন</small>
+            <h5 class="modal-title fw-bold mb-0" id="enrollModalLabel">কোর্স এনরোলমেন্ট ও পেমেন্ট (বাংলাদেশ)</h5>
+            <small class="text-white-50">বিকাশ, নগদ, রকেট ও কার্ডে তাৎক্ষণিক অ্যাক্সেস</small>
           </div>
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -212,31 +246,33 @@
               <div class="mb-3">
                 <label for="studentEmail" class="form-label small fw-bold">ইমেইল অ্যাড্রেস <span class="text-danger">*</span></label>
                 <input type="email" class="form-control" id="studentEmail" name="studentEmail" placeholder="you@example.com" required />
-                <div class="form-text small">কোর্সের লগইন ও ক্লাসরুম লিঙ্ক এই ইমেইলে যাবে।</div>
+                <div class="form-text small">কোর্সের পোর্টাল লগইন ও লেকচার লিঙ্ক এই ইমেইলে পাঠানো হবে।</div>
               </div>
 
               <div class="mb-3">
-                <label for="studentPhone" class="form-label small fw-bold">মোবাইল নম্বর <span class="text-danger">*</span></label>
+                <label for="studentPhone" class="form-label small fw-bold">মোবাইল নম্বর (বাংলাদেশ) <span class="text-danger">*</span></label>
                 <div class="input-group">
-                  <span class="input-group-text bg-light text-muted small">+88</span>
+                  <span class="input-group-text bg-light text-muted small fw-bold">+88</span>
                   <input
                     type="tel"
                     class="form-control"
                     id="studentPhone"
                     name="studentPhone"
-                    placeholder="017XXXXXXXX"
-                    pattern="[0-9]{11}"
-                    title="১১ ডিজিটের সঠিক মোবাইল নম্বর দিন"
+                    placeholder="01712345678"
+                    pattern="01[3-9][0-9]{8}"
+                    title="১১ ডিজিটের বাংলাদেশি মোবাইল নম্বর লিখুন (e.g. 017XXXXXXXX)"
                     required
+                    oninput="validateBdPhone(this)"
                   />
                 </div>
+                <div class="form-text small" id="phoneHint">১১ ডিজিটের সচল নম্বর দিন (বিকাশ/নগদ নিশ্চিতকরণ এসএমএস যাবে)।</div>
               </div>
             </div>
 
             <!-- Right Column: Course Summary & Payment Method -->
             <div class="col-md-6">
               <h6 class="fw-bold text-dark mb-3">
-                <i class="fa-solid fa-credit-card text-success me-2"></i>২. পেমেন্ট ও সামারি
+                <i class="fa-solid fa-credit-card text-success me-2"></i>২. পেমেন্ট ও সামারি (৳ BDT)
               </h6>
 
               <!-- Selected Course Card -->
@@ -244,22 +280,25 @@
                 <div class="small text-muted">নির্বাচিত কোর্স:</div>
                 <h6 class="fw-bold mb-1 text-primary text-truncate" id="modalCourseTitle">Course Title</h6>
                 <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                  <span class="text-muted small">মোট প্রদেয় ফি:</span>
+                  <span class="text-muted small">মোট প্রদেয় কোর্স ফি:</span>
                   <span class="fw-bold fs-4 text-success" id="modalCoursePrice">৳০</span>
                 </div>
               </div>
 
-              <!-- Payment Method Selection -->
+              <!-- Payment Method Selection (4 Bangladeshi Options) -->
               <div class="mb-3">
                 <label class="form-label small fw-bold">পেমেন্ট মেথড নির্বাচন করুন</label>
-                <div class="d-flex flex-wrap gap-2 mb-2" id="paymentMethodSelector">
-                  <button type="button" class="btn btn-sm btn-outline-primary active flex-fill py-2 pay-opt-btn" onclick="selectPaymentMethod('bKash', this)">
+                <div class="d-grid grid-template-columns gap-2 mb-2" style="grid-template-columns: 1fr 1fr;" id="paymentMethodSelector">
+                  <button type="button" class="btn btn-sm btn-outline-primary active py-2 pay-opt-btn" onclick="selectPaymentMethod('bKash', this)">
                     <i class="fa-solid fa-mobile-screen me-1 text-danger"></i> বিকাশ (bKash)
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-primary flex-fill py-2 pay-opt-btn" onclick="selectPaymentMethod('Nagad', this)">
+                  <button type="button" class="btn btn-sm btn-outline-primary py-2 pay-opt-btn" onclick="selectPaymentMethod('Nagad', this)">
                     <i class="fa-solid fa-wallet me-1 text-warning"></i> নগদ (Nagad)
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-primary flex-fill py-2 pay-opt-btn" onclick="selectPaymentMethod('Card', this)">
+                  <button type="button" class="btn btn-sm btn-outline-primary py-2 pay-opt-btn" onclick="selectPaymentMethod('Rocket', this)">
+                    <i class="fa-solid fa-rocket me-1 text-purple" style="color: #8e24aa;"></i> রকেট (Rocket)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-primary py-2 pay-opt-btn" onclick="selectPaymentMethod('Card', this)">
                     <i class="fa-solid fa-credit-card me-1 text-info"></i> কার্ড / অন্যান্য
                   </button>
                 </div>
@@ -272,7 +311,12 @@
                 <div id="instrBkash">
                   <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="badge bg-danger">bKash Personal / Send Money</span>
-                    <strong class="text-dark font-monospace user-select-all" id="bkashNumber">01712-345678</strong>
+                    <div class="d-flex align-items-center gap-1">
+                      <strong class="text-dark font-monospace user-select-all" id="bkashNumber">01712-345678</strong>
+                      <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1 btn-copy-clipboard" onclick="copyToClipboard('01712345678', this)" title="নম্বর কপি করুন">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
                   </div>
                   <ol class="small text-secondary ps-3 mb-2">
                     <li>বিকাশ অ্যাপ ওপেন করে <strong>Send Money</strong> সিলেক্ট করুন।</li>
@@ -285,7 +329,12 @@
                 <div id="instrNagad" class="d-none">
                   <div class="d-flex align-items-center justify-content-between mb-2">
                     <span class="badge bg-warning text-dark">Nagad Personal / Send Money</span>
-                    <strong class="text-dark font-monospace user-select-all">01898-765432</strong>
+                    <div class="d-flex align-items-center gap-1">
+                      <strong class="text-dark font-monospace user-select-all" id="nagadNumber">01898-765432</strong>
+                      <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1 btn-copy-clipboard" onclick="copyToClipboard('01898765432', this)" title="নম্বর কপি করুন">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
                   </div>
                   <ol class="small text-secondary ps-3 mb-2">
                     <li>নগদ অ্যাপে ঢুকে <strong>Send Money</strong> অপশন বেছে নিন।</li>
@@ -294,19 +343,37 @@
                   </ol>
                 </div>
 
+                <!-- Rocket instructions -->
+                <div id="instrRocket" class="d-none">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="badge" style="background-color: #8e24aa; color: #fff;">DBBL Rocket Personal</span>
+                    <div class="d-flex align-items-center gap-1">
+                      <strong class="text-dark font-monospace user-select-all" id="rocketNumber">01912-345678-9</strong>
+                      <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1 btn-copy-clipboard" onclick="copyToClipboard('019123456789', this)" title="নম্বর কপি করুন">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <ol class="small text-secondary ps-3 mb-2">
+                    <li>রকেট অ্যাপ বা *322# ডায়াল করে <strong>Send Money</strong> নির্বাচন করুন।</li>
+                    <li>নম্বর: <strong>01912-345678-9</strong> এ ফি প্রদান করুন।</li>
+                    <li>ট্রানজেকশন সফল হলে পাওয়া <strong>TrxID</strong> নিচে দিন।</li>
+                  </ol>
+                </div>
+
                 <!-- Card instructions -->
                 <div id="instrCard" class="d-none">
                   <div class="small text-secondary mb-2">
-                    <i class="fa-solid fa-shield-check text-success me-1"></i> Visa, Mastercard, DBBL Nexus ও যেকোনো ব্যাংকের কার্ড সাপোর্টেড।
+                    <i class="fa-solid fa-shield-check text-success me-1"></i> Visa, Mastercard, DBBL NexusPay ও দেশের যেকোনো ব্যাংকের কার্ড সাপোর্টেড।
                   </div>
-                  <small class="text-muted">এনরোল কনফার্ম করার পর সিকিউরড পেমেন্ট গেটওয়ে পেজে রিডাইরেক্ট হবে।</small>
+                  <small class="text-muted">এনরোল কনফার্ম বাটনে ক্লিক করার সাথে সাথে সিকিউরড লোকাল পেমেন্ট গেটওয়েতে রিডাইরেক্ট হবে।</small>
                 </div>
               </div>
 
-              <!-- Transaction ID Input (for bKash / Nagad) -->
+              <!-- Transaction ID Input (for bKash / Nagad / Rocket) -->
               <div class="mb-3" id="trxIdContainer">
                 <label for="trxId" class="form-label small fw-bold">
-                  বিকাশ / নগদ ট্রানজেকশন আইডি (TrxID) <span class="text-danger">*</span>
+                  বিকাশ / নগদ / রকেট TrxID <span class="text-danger">*</span>
                 </label>
                 <input
                   type="text"
@@ -316,11 +383,12 @@
                   placeholder="e.g. 9J7K2L8M1N"
                   required
                 />
+                <div class="form-text small">পেমেন্ট কনফার্মেশন এসএমএসের TrxID এখানে লিখুন।</div>
               </div>
 
               <!-- Guarantee Badge -->
               <div class="p-2 bg-success bg-opacity-10 rounded-2 text-success small text-center">
-                <i class="fa-solid fa-badge-check me-1"></i> ১০০% মানিব্যাক গ্যারান্টি &bull; ৭ দিনের ট্রায়াল সুবিধা
+                <i class="fa-solid fa-shield-check me-1"></i> ১০০% মানিব্যাক গ্যারান্টি &bull; ৭ দিনের ট্রায়াল সুবিধা
               </div>
             </div>
           </div>
@@ -341,6 +409,11 @@
 <script>
   let currentActiveCategory = 'all';
 
+  function formatBDT(num) {
+    if (!num || isNaN(num)) return '০';
+    return Number(num).toLocaleString('en-IN');
+  }
+
   function selectCategoryFilter(cat, btn) {
     currentActiveCategory = cat.toLowerCase();
     document.querySelectorAll('.cat-filter-btn').forEach(b => {
@@ -353,7 +426,14 @@
   }
 
   function applyReactiveFilters() {
-    const searchVal = (document.getElementById('courseSearchInput').value || '').toLowerCase().trim();
+    const searchInput = document.getElementById('courseSearchInput');
+    const searchVal = (searchInput.value || '').toLowerCase().trim();
+    const clearBtn = document.getElementById('clearSearchBtn');
+    if (clearBtn) {
+      if (searchVal.length > 0) clearBtn.classList.remove('d-none');
+      else clearBtn.classList.add('d-none');
+    }
+
     const items = document.querySelectorAll('.course-card-wrapper');
     let visibleCount = 0;
 
@@ -382,10 +462,39 @@
     }
   }
 
+  function clearSearchInput() {
+    const searchInput = document.getElementById('courseSearchInput');
+    searchInput.value = '';
+    applyReactiveFilters();
+    searchInput.focus();
+  }
+
   function resetFilters() {
     document.getElementById('courseSearchInput').value = '';
     const allBtn = document.querySelector('.cat-filter-btn[data-cat="all"]');
     if (allBtn) selectCategoryFilter('all', allBtn);
+  }
+
+  function applyReactiveSorting() {
+    const sortVal = document.getElementById('courseSortSelect').value;
+    const grid = document.getElementById('coursesGrid');
+    const cards = Array.from(grid.querySelectorAll('.course-card-wrapper'));
+
+    cards.sort((a, b) => {
+      const priceA = parseFloat(a.getAttribute('data-price')) || 0;
+      const priceB = parseFloat(b.getAttribute('data-price')) || 0;
+      const ratingA = parseFloat(a.getAttribute('data-rating')) || 0;
+      const ratingB = parseFloat(b.getAttribute('data-rating')) || 0;
+      const enrolledA = parseInt(a.getAttribute('data-enrolled'), 10) || 0;
+      const enrolledB = parseInt(b.getAttribute('data-enrolled'), 10) || 0;
+
+      if (sortVal === 'price-asc') return priceA - priceB;
+      if (sortVal === 'price-desc') return priceB - priceA;
+      if (sortVal === 'rating-desc') return ratingB - ratingA;
+      return enrolledB - enrolledA; // featured / popularity
+    });
+
+    cards.forEach(card => grid.appendChild(card));
   }
 
   function selectPaymentMethod(method, btn) {
@@ -395,22 +504,31 @@
 
     const instrBkash = document.getElementById('instrBkash');
     const instrNagad = document.getElementById('instrNagad');
+    const instrRocket = document.getElementById('instrRocket');
     const instrCard = document.getElementById('instrCard');
     const trxContainer = document.getElementById('trxIdContainer');
     const trxInput = document.getElementById('trxId');
 
     instrBkash.classList.add('d-none');
     instrNagad.classList.add('d-none');
+    instrRocket.classList.add('d-none');
     instrCard.classList.add('d-none');
 
     if (method === 'bKash') {
       instrBkash.classList.remove('d-none');
       trxContainer.classList.remove('d-none');
       trxInput.required = true;
+      trxInput.placeholder = 'e.g. 9J7K2L8M1N';
     } else if (method === 'Nagad') {
       instrNagad.classList.remove('d-none');
       trxContainer.classList.remove('d-none');
       trxInput.required = true;
+      trxInput.placeholder = 'e.g. 8X4Y2Z9A';
+    } else if (method === 'Rocket') {
+      instrRocket.classList.remove('d-none');
+      trxContainer.classList.remove('d-none');
+      trxInput.required = true;
+      trxInput.placeholder = 'e.g. 7R3T9P1Q';
     } else {
       instrCard.classList.remove('d-none');
       trxContainer.classList.add('d-none');
@@ -418,12 +536,49 @@
     }
   }
 
+  function copyToClipboard(text, btn) {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = btn.innerHTML;
+        btn.classList.add('copied');
+        btn.innerHTML = `<i class="fa-solid fa-check text-white"></i>`;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = originalHtml;
+        }, 2000);
+      });
+    }
+  }
+
+  function validateBdPhone(input) {
+    const val = input.value.trim();
+    const hint = document.getElementById('phoneHint');
+    const bdRegex = /^01[3-9]\d{8}$/;
+    if (val.length === 11) {
+      if (bdRegex.test(val)) {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        hint.textContent = 'সঠিক বাংলাদেশি নম্বর।';
+        hint.className = 'form-text small text-success';
+      } else {
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+        hint.textContent = 'ভুল অপারেটর প্রিফিক্স (০১৩ থেকে ০১৯ ব্যবহার করুন)।';
+        hint.className = 'form-text small text-danger';
+      }
+    } else {
+      input.classList.remove('is-valid', 'is-invalid');
+      hint.textContent = '১১ ডিজিটের মোবাইল নম্বর দিন (' + val.length + '/11)।';
+      hint.className = 'form-text small text-muted';
+    }
+  }
+
   function openEnrollModal(courseId, title, price) {
     document.getElementById('modalCourseId').value = courseId;
     document.getElementById('modalCoursePriceInput').value = price;
     document.getElementById('modalCourseTitle').textContent = title;
-    document.getElementById('modalCoursePrice').textContent = '৳' + Number(price).toLocaleString('en-IN');
-    document.getElementById('btnSubmitEnroll').innerHTML = `<i class="fa-solid fa-lock me-1"></i> এনরোল কনফার্ম করুন (৳${Number(price).toLocaleString('en-IN')})`;
+    document.getElementById('modalCoursePrice').textContent = '৳' + formatBDT(price);
+    document.getElementById('btnSubmitEnroll').innerHTML = `<i class="fa-solid fa-lock me-1"></i> এনরোল কনফার্ম করুন (৳${formatBDT(price)})`;
     const modal = new bootstrap.Modal(document.getElementById('enrollModal'));
     modal.show();
   }
@@ -431,7 +586,7 @@
   function handleEnrollSubmit(e) {
     const btn = document.getElementById('btnSubmitEnroll');
     btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>এনরোলমেন্ট প্রসেসিং হচ্ছে...`;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>এনরোলমেন্ট সম্পন্ন হচ্ছে...`;
     return true;
   }
 </script>

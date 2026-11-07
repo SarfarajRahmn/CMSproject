@@ -421,6 +421,12 @@ footer.footer-custom a:hover {
    Responsive & Reactive Enhancements
    ========================================================================== */
 
+@media (min-width: 992px) {
+  .border-top-lg-0 {
+    border-top: 0 !important;
+  }
+}
+
 @media (min-width: 768px) {
   .border-end-md {
     border-right: 1px solid var(--border-color);
@@ -429,16 +435,17 @@ footer.footer-custom a:hover {
 
 @media (max-width: 767.98px) {
   .hero-section {
-    padding: 2.5rem 1.25rem;
+    padding: 2.2rem 1.15rem;
     border-radius: var(--radius-md);
+    margin-bottom: 2rem;
   }
 
   .stat-box {
-    padding: 1rem 0.75rem;
+    padding: 0.9rem 0.6rem;
   }
 
   .stat-number {
-    font-size: 1.6rem;
+    font-size: 1.45rem;
   }
 
   .course-thumbnail-wrapper {
@@ -451,31 +458,134 @@ footer.footer-custom a:hover {
 
   /* Padding for fixed bottom bar on course detail page */
   body.course-detail-page {
-    padding-bottom: 80px;
+    padding-bottom: 90px;
   }
+
+  /* Compact form card on mobile */
+  .form-card {
+    padding: 1.4rem 1.1rem;
+  }
+}
+
+/* Horizontal scrollable category filters for responsive mobile experience */
+.category-scroll-container {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.category-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
 }
 
 /* Touch-friendly buttons & smooth focus */
 .cat-filter-btn {
   border-radius: 50px;
-  padding: 0.35rem 0.9rem;
+  padding: 0.4rem 1rem;
   font-weight: 600;
-  transition: all 0.2s ease;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .cat-filter-btn.active {
-  box-shadow: 0 4px 10px rgba(13, 71, 161, 0.25);
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
   transform: translateY(-1px);
 }
 
 .pay-opt-btn {
   border-radius: var(--radius-sm);
   font-weight: 600;
+  font-size: 0.9rem;
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .pay-opt-btn.active {
   background-color: #0d47a1 !important;
   color: #fff !important;
-  box-shadow: 0 4px 10px rgba(13, 71, 161, 0.25);
+  box-shadow: 0 4px 12px rgba(13, 71, 161, 0.25);
+  border-color: #0d47a1 !important;
+}
+
+/* Copy to Clipboard Button Feedback */
+.btn-copy-clipboard {
+  transition: all 0.2s ease;
+}
+
+.btn-copy-clipboard.copied {
+  background-color: #198754 !important;
+  color: #ffffff !important;
+  border-color: #198754 !important;
+}
+
+/* Live Reactive Preview Container */
+.live-preview-box {
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.live-preview-box:hover {
+  border-color: var(--primary-color);
+}
+
+/* Reactive Discount Pill */
+.discount-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* Sticky Bottom Floating Purchase Bar (Mobile) */
+.mobile-sticky-checkout-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1040;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border-color);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  padding: 0.75rem 1rem;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Smooth fade transitions for reactive filtering */
+.course-card-wrapper {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Print Invoice Styles */
+@media print {
+  nav, footer, .btn, .breadcrumb, .no-print {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .print-invoice-card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
 }

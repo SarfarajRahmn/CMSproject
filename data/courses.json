@@ -12,7 +12,7 @@
     "lessonsCount": 78,
     "rating": 4.9,
     "reviewsCount": 428,
-    "enrolledCount": 1850,
+    "enrolledCount": 1851,
     "badge": "Bestseller",
     "thumbnail": "/images/WEB.png",
     "instructor": {
@@ -29,20 +29,11 @@
     ],
     "syllabus": [
       {
-        "module": "Module 1: Web Foundations & Modern CSS3 Layouts",
-        "lessons": ["Semantic HTML5 & Accessibility", "Flexbox, CSS Grid & Responsive Design", "Bootstrap 5 & Tailwind CSS Masterclass", "Project 1: Professional Company Landing Page"]
-      },
-      {
-        "module": "Module 2: Advanced JavaScript (ES6+) & DOM",
-        "lessons": ["Closures, Scope & Event Loop", "Async/Await, Promises & Fetch API", "DOM Manipulation & Modular Code", "Project 2: Interactive Task Management System"]
-      },
-      {
-        "module": "Module 3: Backend Engineering with Node.js & Express",
-        "lessons": ["Node.js Architecture & Express Routing", "JWT Authentication & Bcrypt Password Hashing", "Middleware & Error Handling Architecture", "Project 3: Full-Stack Content Management System"]
-      },
-      {
-        "module": "Module 4: PostgreSQL Databases & Cloud Deployment",
-        "lessons": ["Relational Schema Modeling & SQL Optimization", "Cloudinary Image Upload Integration", "Deploying to Vercel & Render with Environment Security", "CI/CD Automation with GitHub Actions"]
+        "module": "Course Modules & Lessons",
+        "lessons": [
+          "মডিউল ১: বেসিক",
+          "মডিউল ২: অ্যাডভান্সড"
+        ]
       }
     ],
     "published": true
@@ -77,19 +68,35 @@
     "syllabus": [
       {
         "module": "Module 1: Foundations of Machine Learning & Neural Nets",
-        "lessons": ["Python for Data Science & PyTorch basics", "Supervised vs Unsupervised Learning", "Neural Network Architectures & Backpropagation"]
+        "lessons": [
+          "Python for Data Science & PyTorch basics",
+          "Supervised vs Unsupervised Learning",
+          "Neural Network Architectures & Backpropagation"
+        ]
       },
       {
         "module": "Module 2: Large Language Models (LLMs) & Prompt Engineering",
-        "lessons": ["Transformer Architecture Deep Dive", "Structured Prompting & Few-Shot Learning", "Function Calling & Structured Outputs with OpenAI/Gemini"]
+        "lessons": [
+          "Transformer Architecture Deep Dive",
+          "Structured Prompting & Few-Shot Learning",
+          "Function Calling & Structured Outputs with OpenAI/Gemini"
+        ]
       },
       {
         "module": "Module 3: Building Vector RAG Systems",
-        "lessons": ["Embeddings & Semantic Search", "Vector Databases: Pinecone, Qdrant & Chroma", "Chunking Strategies & Hybrid Search"]
+        "lessons": [
+          "Embeddings & Semantic Search",
+          "Vector Databases: Pinecone, Qdrant & Chroma",
+          "Chunking Strategies & Hybrid Search"
+        ]
       },
       {
         "module": "Module 4: Autonomous Multi-Agent Workflows",
-        "lessons": ["Agentic Architectures & Tool Use", "Memory Management in AI Agents", "Project: Enterprise Customer Intelligence Agent"]
+        "lessons": [
+          "Agentic Architectures & Tool Use",
+          "Memory Management in AI Agents",
+          "Project: Enterprise Customer Intelligence Agent"
+        ]
       }
     ],
     "published": true
@@ -124,19 +131,35 @@
     "syllabus": [
       {
         "module": "Module 1: Advanced SQL & Relational Modeling",
-        "lessons": ["Relational Integrity & Normalization", "Window Functions & Analytic Queries", "Common Table Expressions (CTEs) & Recursive Queries"]
+        "lessons": [
+          "Relational Integrity & Normalization",
+          "Window Functions & Analytic Queries",
+          "Common Table Expressions (CTEs) & Recursive Queries"
+        ]
       },
       {
         "module": "Module 2: Indexing & Query Tuning",
-        "lessons": ["Anatomy of an Index: B-Trees & Beyond", "Reading Query Plans with EXPLAIN (ANALYZE, BUFFERS)", "Eliminating Table Scans & Optimizing Joins"]
+        "lessons": [
+          "Anatomy of an Index: B-Trees & Beyond",
+          "Reading Query Plans with EXPLAIN (ANALYZE, BUFFERS)",
+          "Eliminating Table Scans & Optimizing Joins"
+        ]
       },
       {
         "module": "Module 3: Concurrency, Locking & Transactions",
-        "lessons": ["Transaction Isolation Levels", "Row-Level Locking vs Table Locks", "Deadlock Prevention & Handling"]
+        "lessons": [
+          "Transaction Isolation Levels",
+          "Row-Level Locking vs Table Locks",
+          "Deadlock Prevention & Handling"
+        ]
       },
       {
         "module": "Module 4: Scaling & Cloud Migration",
-        "lessons": ["Partitioning Large Tables", "Connection Pooling with PgBouncer", "Serverless PostgreSQL with Neon.tech"]
+        "lessons": [
+          "Partitioning Large Tables",
+          "Connection Pooling with PgBouncer",
+          "Serverless PostgreSQL with Neon.tech"
+        ]
       }
     ],
     "published": true
@@ -171,19 +194,35 @@
     "syllabus": [
       {
         "module": "Module 1: Docker Deep Dive",
-        "lessons": ["Container Architecture vs Virtual Machines", "Writing Production Dockerfiles & Multi-Stage Builds", "Docker Compose for Local Multi-Service Development"]
+        "lessons": [
+          "Container Architecture vs Virtual Machines",
+          "Writing Production Dockerfiles & Multi-Stage Builds",
+          "Docker Compose for Local Multi-Service Development"
+        ]
       },
       {
         "module": "Module 2: CI/CD Automation",
-        "lessons": ["GitHub Actions Workflows", "Automated Linting, Testing & Security Scans", "Pushing Images to Docker Hub & GitHub Container Registry"]
+        "lessons": [
+          "GitHub Actions Workflows",
+          "Automated Linting, Testing & Security Scans",
+          "Pushing Images to Docker Hub & GitHub Container Registry"
+        ]
       },
       {
         "module": "Module 3: Kubernetes Orchestration",
-        "lessons": ["Kubernetes Architecture & Minikube", "Deployments, ReplicaSets & Rolling Updates", "Service Networking & Ingress Controllers"]
+        "lessons": [
+          "Kubernetes Architecture & Minikube",
+          "Deployments, ReplicaSets & Rolling Updates",
+          "Service Networking & Ingress Controllers"
+        ]
       },
       {
         "module": "Module 4: Observability & Production Readiness",
-        "lessons": ["Centralized Logging with Fluentd", "Metrics & Alerting with Prometheus", "Zero-Downtime Deployment Strategies"]
+        "lessons": [
+          "Centralized Logging with Fluentd",
+          "Metrics & Alerting with Prometheus",
+          "Zero-Downtime Deployment Strategies"
+        ]
       }
     ],
     "published": true

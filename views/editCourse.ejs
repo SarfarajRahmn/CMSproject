@@ -1,23 +1,36 @@
-<%- include('partials/header', { title: 'Edit Course' }) %>
+<%- include('partials/header', { title: 'Edit Course - ' + course.title }) %>
 <%- include('partials/navbar', { page: 'courses' }) %>
 
-<main class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-9">
+<main class="container my-4 my-md-5">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="/courses" class="text-decoration-none">Courses</a></li>
+      <li class="breadcrumb-item"><a href="/courses/<%= course.id %>" class="text-decoration-none text-truncate" style="max-width: 250px;"><%= course.title %></a></li>
+      <li class="breadcrumb-item active" aria-current="page">Edit Course</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Main Edit Form Column -->
+    <div class="col-lg-8">
       <div class="form-card">
-        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3 flex-wrap gap-2">
           <div>
             <h2 class="h3 fw-bold mb-1">
               <i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Course
             </h2>
-            <p class="text-muted small mb-0">Update course details, pricing, syllabus, or thumbnail.</p>
+            <p class="text-muted small mb-0">Update course details, Bangladesh (৳ BDT) pricing, syllabus, and thumbnail.</p>
           </div>
-          <a href="/courses/<%= course.id %>" class="btn btn-outline-secondary btn-sm">
-            <i class="fa-solid fa-xmark me-1"></i> Cancel
-          </a>
+          <div class="d-flex gap-2">
+            <a href="/courses/<%= course.id %>" class="btn btn-outline-secondary btn-sm">
+              <i class="fa-solid fa-arrow-left me-1"></i> View Course
+            </a>
+          </div>
         </div>
 
-        <form action="/courses/edit/<%= course.id %>" method="POST" enctype="multipart/form-data">
+        <form action="/courses/edit/<%= course.id %>" method="POST" enctype="multipart/form-data" id="editCourseForm" onsubmit="return handleFormSubmit(event)">
           <!-- Course Title -->
           <div class="mb-3">
             <label for="title" class="form-label fw-bold">Course Title <span class="text-danger">*</span></label>
@@ -27,7 +40,9 @@
               id="title"
               name="title"
               value="<%= course.title %>"
+              placeholder="e.g. Full-Stack Web Development Bootcamp"
               required
+              oninput="updateLivePreview()"
             />
           </div>
 
@@ -39,7 +54,9 @@
               id="subtitle"
               name="subtitle"
               rows="2"
+              placeholder="Brief course overview in Bangla or English..."
               required
+              oninput="updateLivePreview()"
             ><%= course.subtitle %></textarea>
           </div>
 
@@ -47,7 +64,7 @@
           <div class="row g-3 mb-3">
             <div class="col-md-4">
               <label for="category" class="form-label fw-bold">Category <span class="text-danger">*</span></label>
-              <select class="form-select" id="category" name="category" required>
+              <select class="form-select" id="category" name="category" required onchange="updateLivePreview()">
                 <% const categories = ['Web Development', 'AI & Machine Learning', 'Database & SQL', 'Cloud & DevOps', 'Mobile Development', 'Cybersecurity']; %>
                 <% categories.forEach(cat => { %>
                   <option value="<%= cat %>" <%= course.category === cat ? 'selected' : '' %>><%= cat %></option>
@@ -56,7 +73,7 @@
             </div>
             <div class="col-md-4">
               <label for="level" class="form-label fw-bold">Difficulty Level</label>
-              <select class="form-select" id="level" name="level">
+              <select class="form-select" id="level" name="level" onchange="updateLivePreview()">
                 <option value="All Levels" <%= course.level === 'All Levels' ? 'selected' : '' %>>All Levels</option>
                 <option value="Beginner to Advanced" <%= course.level === 'Beginner to Advanced' ? 'selected' : '' %>>Beginner to Advanced</option>
                 <option value="Intermediate" <%= course.level === 'Intermediate' ? 'selected' : '' %>>Intermediate</option>
@@ -65,46 +82,165 @@
             </div>
             <div class="col-md-4">
               <label for="badge" class="form-label fw-bold">Promotional Badge</label>
-              <select class="form-select" id="badge" name="badge">
-                <option value="New" <%= course.badge === 'New' ? 'selected' : '' %>>New</option>
+              <select class="form-select" id="badge" name="badge" onchange="updateLivePreview()">
                 <option value="Bestseller" <%= course.badge === 'Bestseller' ? 'selected' : '' %>>Bestseller</option>
                 <option value="Hot" <%= course.badge === 'Hot' ? 'selected' : '' %>>Hot & Trending</option>
                 <option value="Popular" <%= course.badge === 'Popular' ? 'selected' : '' %>>Popular</option>
+                <option value="New" <%= course.badge === 'New' ? 'selected' : '' %>>New</option>
                 <option value="" <%= !course.badge ? 'selected' : '' %>>None</option>
               </select>
             </div>
           </div>
 
-          <!-- Pricing & Duration Row -->
-          <div class="row g-3 mb-3">
-            <div class="col-md-3">
-              <label for="price" class="form-label fw-bold">Price (৳ BDT) <span class="text-danger">*</span></label>
-              <input type="number" step="50" class="form-control" id="price" name="price" value="<%= course.price %>" required />
+          <!-- Bangladesh Pricing & Duration Row with Live Calculator -->
+          <div class="card p-3 bg-light border rounded-3 mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="fw-bold text-dark small">
+                <i class="fa-solid fa-bangladeshi-taka-sign text-success me-1"></i> বাংলাদেশ বেসড কোর্স ফি ও প্রাইসিং (BDT ৳)
+              </span>
+              <span id="reactiveDiscountBadge" class="discount-live-pill d-none">
+                <i class="fa-solid fa-tag"></i> <span id="discountValueText">0% ছাড়</span>
+              </span>
             </div>
-            <div class="col-md-3">
-              <label for="originalPrice" class="form-label fw-bold">Original Price (৳ BDT)</label>
-              <input type="number" step="50" class="form-control" id="originalPrice" name="originalPrice" value="<%= course.originalPrice %>" />
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="price" class="form-label small fw-bold">বিক্রয় মূল্য / Offer Price (৳ BDT) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white fw-bold text-success">৳</span>
+                  <input
+                    type="number"
+                    step="50"
+                    min="0"
+                    class="form-control fw-bold fs-6 text-success"
+                    id="price"
+                    name="price"
+                    value="<%= course.price %>"
+                    placeholder="4500"
+                    required
+                    oninput="recalculatePricing(); updateLivePreview();"
+                  />
+                  <span class="input-group-text bg-white text-muted small">BDT</span>
+                </div>
+                <div class="form-text small">শিক্ষার্থী এই পরিমাণ ফি পরিশোধ করবে।</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="originalPrice" class="form-label small fw-bold">আসল মূল্য / List Price (৳ BDT)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white fw-bold text-muted">৳</span>
+                  <input
+                    type="number"
+                    step="50"
+                    min="0"
+                    class="form-control text-secondary"
+                    id="originalPrice"
+                    name="originalPrice"
+                    value="<%= course.originalPrice %>"
+                    placeholder="8500"
+                    oninput="recalculatePricing(); updateLivePreview();"
+                  />
+                  <span class="input-group-text bg-white text-muted small">BDT</span>
+                </div>
+                <div class="form-text small">ডিসকাউন্ট প্রদর্শনের জন্য আসল ফি দিন।</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="duration" class="form-label small fw-bold">কোর্সের মেয়াদ / Duration</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white text-muted"><i class="fa-regular fa-clock"></i></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="duration"
+                    name="duration"
+                    value="<%= course.duration %>"
+                    placeholder="e.g. 14 Weeks (60+ Hours)"
+                    oninput="updateLivePreview()"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="lessonsCount" class="form-label small fw-bold">মোট লেকচার সংখ্যা</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white text-muted"><i class="fa-solid fa-play"></i></span>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="lessonsCount"
+                    name="lessonsCount"
+                    value="<%= course.lessonsCount %>"
+                    placeholder="e.g. 78"
+                    oninput="updateLivePreview()"
+                  />
+                </div>
+              </div>
             </div>
-            <div class="col-md-3">
-              <label for="duration" class="form-label fw-bold">Duration</label>
-              <input type="text" class="form-control" id="duration" name="duration" value="<%= course.duration %>" />
+
+            <!-- Reactive Savings Alert Banner -->
+            <div id="savingsNotice" class="mt-3 p-2.5 rounded-2 bg-success bg-opacity-10 border border-success border-opacity-25 small text-success d-none">
+              <i class="fa-solid fa-circle-check me-1"></i> শিক্ষার্থী সাশ্রয় করবে: 
+              <strong id="savingsAmountText">৳০</strong> (<strong id="savingsPercentText">০%</strong> ডিসকাউন্ট)
             </div>
-            <div class="col-md-3">
-              <label for="lessonsCount" class="form-label fw-bold">Lessons Count</label>
-              <input type="number" class="form-control" id="lessonsCount" name="lessonsCount" value="<%= course.lessonsCount %>" />
+            <div id="pricingWarning" class="mt-3 p-2 rounded-2 bg-warning bg-opacity-10 border border-warning text-dark small d-none">
+              <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i> অফার মূল্য আসল মূল্যের চেয়ে বেশি হতে পারবে না।
             </div>
           </div>
 
-          <!-- Thumbnail -->
+          <!-- Instructor Information Row -->
+          <div class="card p-3 bg-light border rounded-3 mb-3">
+            <span class="fw-bold text-dark small mb-2 d-block">
+              <i class="fa-solid fa-chalkboard-user text-primary me-1"></i> কোর্স শিক্ষক / মেন্টর ইনফরমেশন
+            </span>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="instructorName" class="form-label small fw-bold">ইন্সট্রাক্টরের নাম</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="instructorName"
+                  name="instructorName"
+                  value="<%= course.instructor ? course.instructor.name : 'Sarfaraj Rahman' %>"
+                  placeholder="e.g. Sarfaraj Rahman"
+                  oninput="updateLivePreview()"
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="instructorTitle" class="form-label small fw-bold">পদবি / পেশা</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="instructorTitle"
+                  name="instructorTitle"
+                  value="<%= course.instructor ? course.instructor.title : 'Senior Full-Stack Engineer' %>"
+                  placeholder="e.g. Senior Full-Stack Engineer & Cloud Architect"
+                  oninput="updateLivePreview()"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Thumbnail Upload & Live Preview -->
           <div class="mb-3">
-            <label class="form-label fw-bold">Current Thumbnail</label>
+            <label class="form-label fw-bold">Course Thumbnail</label>
             <% if (course.thumbnail) { %>
-              <div class="mb-2">
-                <img src="<%= course.thumbnail %>" alt="Thumbnail" class="img-thumbnail rounded" style="max-height: 140px;" />
+              <div class="mb-2 d-flex align-items-center gap-3 p-2 bg-light rounded-3 border">
+                <img
+                  src="<%= course.thumbnail %>"
+                  alt="Thumbnail"
+                  id="existingThumbnailImg"
+                  class="img-thumbnail rounded"
+                  style="max-height: 100px; max-width: 150px; object-fit: cover;"
+                />
+                <div>
+                  <span class="badge bg-secondary mb-1">Current Active Thumbnail</span>
+                  <div class="small text-muted">আপলোড করা নতুন থাম্বনেইল থাকলে এটি প্রতিস্থাপিত হবে।</div>
+                </div>
               </div>
             <% } %>
-            <input type="hidden" name="existingThumbnail" value="<%= course.thumbnail || '' %>" />
-            <label for="featureImage" class="form-label small text-muted">Upload New Thumbnail (optional)</label>
+            <input type="hidden" name="existingThumbnail" id="existingThumbnailInput" value="<%= course.thumbnail || '' %>" />
+            <label for="featureImage" class="form-label small text-muted">Upload New Thumbnail Image</label>
             <input
               type="file"
               class="form-control"
@@ -114,8 +250,49 @@
               onchange="previewCourseThumbnail(this)"
             />
             <div id="courseThumbnailPreviewContainer" class="mt-2 d-none text-center p-2 bg-light rounded-3 border">
-              <img id="courseThumbnailPreview" src="#" alt="Preview" class="img-fluid rounded" style="max-height: 200px;" />
+              <img id="courseThumbnailPreview" src="#" alt="New Preview" class="img-fluid rounded" style="max-height: 200px;" />
+              <div class="small text-success mt-1 fw-semibold"><i class="fa-solid fa-circle-check me-1"></i>নতুন থাম্বনেইল নির্বাচিত হয়েছে</div>
             </div>
+          </div>
+
+          <!-- Course Highlights (One per line) -->
+          <div class="mb-3">
+            <label for="highlights" class="form-label fw-bold">
+              কোর্সের মূল আকর্ষণ ও ফিচারসমূহ (Highlights - প্রতি লাইনে একটি)
+            </label>
+            <textarea
+              class="form-control font-monospace small"
+              id="highlights"
+              name="highlights"
+              rows="4"
+              placeholder="৮টি বাস্তবসম্মত ফুল-স্ট্যাক রিয়েল-ওয়ার্ল্ড প্রজেক্ট&#10;Modern JavaScript (ES6+), React 18, Node.js REST APIs&#10;PostgreSQL ডাটাবেস ডিজাইন ও সিকিউরিটি&#10;লাইভ সাপোর্ট ও ইন্টারভিউ গাইডেন্স"
+            ><%= course.highlights ? course.highlights.join('\n') : '' %></textarea>
+            <div class="form-text small">প্রতি লাইনে একটি করে বৈশিষ্ট্য লিখুন। স্টুডেন্ট পেজে টিকচিহ্ন সহ প্রদর্শিত হবে।</div>
+          </div>
+
+          <!-- Curriculum Syllabus Lessons -->
+          <div class="mb-4">
+            <label for="syllabus" class="form-label fw-bold">
+              কারিকুলাম ও লেকচার তালিকা (Syllabus Lessons - প্রতি লাইনে একটি ক্লাস)
+            </label>
+            <% 
+              let syllabusText = '';
+              if (course.syllabus && course.syllabus.length > 0) {
+                syllabusText = course.syllabus.map(mod => {
+                  const modTitle = mod.module || 'Module';
+                  const lessons = mod.lessons && mod.lessons.length > 0 ? mod.lessons.join('\n  - ') : '';
+                  return modTitle + (lessons ? '\n  - ' + lessons : '');
+                }).join('\n\n');
+              }
+            %>
+            <textarea
+              class="form-control font-monospace small"
+              id="syllabus"
+              name="syllabus"
+              rows="6"
+              placeholder="Module 1: Foundations of Web Development&#10;  - HTML5 & CSS3 Essentials&#10;  - JavaScript Core Mechanics&#10;&#10;Module 2: Server-Side Engineering&#10;  - Node.js & Express Routing&#10;  - PostgreSQL Relational Database"
+            ><%= syllabusText %></textarea>
+            <div class="form-text small">মডিউল ও লেকচারগুলো লাইন অনুসারে দিন। স্টুডেন্ট পেজে একর্ডিয়ন আকারে সুন্দরভাবে সাজানো হবে।</div>
           </div>
 
           <!-- Published Switch -->
@@ -128,34 +305,190 @@
                 id="published"
                 name="published"
                 <%= course.published ? 'checked' : '' %>
+                onchange="updateLivePreview()"
               />
               <label class="form-check-label fw-semibold" for="published">
-                Published on catalog
+                ওয়েবসাইটে কোর্সটি সরাসরি লাইভ পাবলিশ রাখুন
               </label>
             </div>
           </div>
 
-          <!-- Submit Buttons -->
-          <div class="d-flex justify-content-end gap-2">
-            <a href="/courses/<%= course.id %>" class="btn btn-secondary-custom">Cancel</a>
-            <button type="submit" class="btn btn-primary-custom">
-              <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+          <!-- Submit Action Buttons -->
+          <div class="d-flex justify-content-end gap-2 flex-wrap">
+            <a href="/courses/<%= course.id %>" class="btn btn-secondary-custom">
+              <i class="fa-solid fa-xmark me-1"></i> বাতিল
+            </a>
+            <button type="submit" class="btn btn-primary-custom" id="btnSubmitCourse">
+              <i class="fa-solid fa-floppy-disk me-1"></i> পরিবর্তন সংরক্ষণ করুন
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- Responsive Live Preview Sticky Column -->
+    <div class="col-lg-4">
+      <div class="sticky-top" style="top: 85px; z-index: 10;">
+        <div class="live-preview-box shadow-sm mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge bg-primary px-2.5 py-1 rounded-pill small">
+              <i class="fa-solid fa-eye me-1"></i> রিয়েল-টাইম লাইভ প্রিভিউ
+            </span>
+            <small class="text-muted fw-semibold">কোর্স কার্ড যেভাবে দেখাবে</small>
+          </div>
+
+          <!-- Live Preview Card -->
+          <div class="course-card bg-white mt-2">
+            <div class="course-thumbnail-wrapper position-relative">
+              <img
+                id="previewCardImg"
+                src="<%= course.thumbnail || '/images/CONTENT.png' %>"
+                alt="Course Preview"
+                onerror="this.src='/images/CONTENT.png'"
+              />
+              <span id="previewCardBadge" class="course-badge-pill badge-<%= (course.badge || 'bestseller').toLowerCase().replace(/[^a-z0-9]/g, '') %> <%= !course.badge ? 'd-none' : '' %>">
+                <%= course.badge || 'Bestseller' %>
+              </span>
+            </div>
+            <div class="p-3 d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span id="previewCardCategory" class="badge bg-primary bg-opacity-10 text-primary small rounded-pill">
+                  <%= course.category %>
+                </span>
+                <span id="previewCardLevel" class="small text-muted"><%= course.level %></span>
+              </div>
+              <h6 class="fw-bold text-dark mb-1 text-truncate" id="previewCardTitle">
+                <%= course.title %>
+              </h6>
+              <p class="text-muted small mb-2 text-truncate" id="previewCardSubtitle">
+                <%= course.subtitle %>
+              </p>
+              <div class="d-flex align-items-center gap-1 small text-muted mb-2">
+                <span class="text-warning"><i class="fa-solid fa-star"></i> <%= course.rating || 4.9 %></span>
+                <span>(<%= course.reviewsCount || 120 %>)</span>
+                <span class="ms-auto" id="previewCardDuration"><i class="fa-regular fa-clock me-1"></i><%= course.duration %></span>
+              </div>
+              <div class="d-flex align-items-baseline justify-content-between pt-2 border-top">
+                <div>
+                  <span class="fs-4 fw-bold text-success" id="previewCardPrice">৳<%= Number(course.price).toLocaleString('en-IN') %></span>
+                  <span class="original-price-tag small" id="previewCardOriginalPrice">
+                    <% if (course.originalPrice && course.originalPrice > course.price) { %>
+                      ৳<%= Number(course.originalPrice).toLocaleString('en-IN') %>
+                    <% } %>
+                  </span>
+                </div>
+                <span class="badge bg-success bg-opacity-10 text-success small py-1 px-2" id="previewSavingsTag">
+                  <%= course.originalPrice && course.originalPrice > course.price ? Math.round((1 - course.price/course.originalPrice)*100) + '% OFF' : 'Best Deal' %>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Helpful Bangladesh Commerce Tips -->
+        <div class="p-3 bg-white rounded-3 border shadow-sm small text-secondary">
+          <h6 class="fw-bold text-dark small mb-2"><i class="fa-solid fa-lightbulb text-warning me-1"></i> প্রাইসিং ও এনরোলমেন্ট টিপস</h6>
+          <ul class="mb-0 ps-3">
+            <li class="mb-1">বাংলাদেশে সাধারণত <strong>৳২,০০০ থেকে ৳৬,০০০</strong> ফি সবচেয়ে আকর্ষণীয় কনভার্সন দেয়।</li>
+            <li class="mb-1">আসল মূল্য ও ছাড় উল্লেখ করলে শিক্ষার্থীরা দ্রুত সিদ্ধান্ত নেয়।</li>
+            <li>শিক্ষার্থীরা সরাসরি <strong>বিকাশ, নগদ বা রকেটে</strong> পেমেন্ট করতে পারবে।</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </main>
 
 <script>
+  function formatBDT(num) {
+    if (!num || isNaN(num)) return '০';
+    return Number(num).toLocaleString('en-IN');
+  }
+
+  function recalculatePricing() {
+    const priceInput = document.getElementById('price');
+    const originalPriceInput = document.getElementById('originalPrice');
+    const discountBadge = document.getElementById('reactiveDiscountBadge');
+    const discountText = document.getElementById('discountValueText');
+    const savingsNotice = document.getElementById('savingsNotice');
+    const savingsAmountText = document.getElementById('savingsAmountText');
+    const savingsPercentText = document.getElementById('savingsPercentText');
+    const pricingWarning = document.getElementById('pricingWarning');
+
+    const price = parseFloat(priceInput.value) || 0;
+    const originalPrice = parseFloat(originalPriceInput.value) || 0;
+
+    if (originalPrice > price && price > 0) {
+      const savings = originalPrice - price;
+      const percent = Math.round((savings / originalPrice) * 100);
+
+      discountBadge.classList.remove('d-none');
+      discountText.textContent = `${percent}% ছাড় (${formatBDT(savings)} ৳ সাশ্রয়)`;
+
+      savingsNotice.classList.remove('d-none');
+      savingsAmountText.textContent = `৳${formatBDT(savings)} BDT`;
+      savingsPercentText.textContent = `${percent}%`;
+
+      pricingWarning.classList.add('d-none');
+    } else if (originalPrice > 0 && price > originalPrice) {
+      discountBadge.classList.add('d-none');
+      savingsNotice.classList.add('d-none');
+      pricingWarning.classList.remove('d-none');
+    } else {
+      discountBadge.classList.add('d-none');
+      savingsNotice.classList.add('d-none');
+      pricingWarning.classList.add('d-none');
+    }
+  }
+
+  function updateLivePreview() {
+    const title = document.getElementById('title').value || 'Course Title';
+    const subtitle = document.getElementById('subtitle').value || 'Course Subtitle';
+    const category = document.getElementById('category').value;
+    const level = document.getElementById('level').value;
+    const badge = document.getElementById('badge').value;
+    const price = parseFloat(document.getElementById('price').value) || 0;
+    const originalPrice = parseFloat(document.getElementById('originalPrice').value) || 0;
+    const duration = document.getElementById('duration').value || '10 Weeks';
+
+    document.getElementById('previewCardTitle').textContent = title;
+    document.getElementById('previewCardSubtitle').textContent = subtitle;
+    document.getElementById('previewCardCategory').textContent = category;
+    document.getElementById('previewCardLevel').textContent = level;
+    document.getElementById('previewCardDuration').innerHTML = `<i class="fa-regular fa-clock me-1"></i>${duration}`;
+    document.getElementById('previewCardPrice').textContent = `৳${formatBDT(price)}`;
+
+    const origElem = document.getElementById('previewCardOriginalPrice');
+    const savingsTag = document.getElementById('previewSavingsTag');
+    if (originalPrice > price) {
+      origElem.textContent = `৳${formatBDT(originalPrice)}`;
+      const pct = Math.round(((originalPrice - price) / originalPrice) * 100);
+      savingsTag.textContent = `${pct}% OFF`;
+      savingsTag.classList.remove('d-none');
+    } else {
+      origElem.textContent = '';
+      savingsTag.textContent = 'Active';
+    }
+
+    const badgeElem = document.getElementById('previewCardBadge');
+    if (badge) {
+      badgeElem.className = 'course-badge-pill badge-' + badge.toLowerCase().replace(/[^a-z0-9]/g, '');
+      badgeElem.textContent = badge;
+      badgeElem.classList.remove('d-none');
+    } else {
+      badgeElem.classList.add('d-none');
+    }
+  }
+
   function previewCourseThumbnail(input) {
     const container = document.getElementById('courseThumbnailPreviewContainer');
     const preview = document.getElementById('courseThumbnailPreview');
+    const cardImg = document.getElementById('previewCardImg');
     if (input.files && input.files[0]) {
       const reader = new FileReader();
       reader.onload = function(e) {
         preview.src = e.target.result;
+        cardImg.src = e.target.result;
         container.classList.remove('d-none');
       }
       reader.readAsDataURL(input.files[0]);
@@ -163,7 +496,19 @@
       container.classList.add('d-none');
     }
   }
+
+  function handleFormSubmit(e) {
+    const btn = document.getElementById('btnSubmitCourse');
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>সংরক্ষণ হচ্ছে...`;
+    return true;
+  }
+
+  // Initialize live calculations on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    recalculatePricing();
+    updateLivePreview();
+  });
 </script>
 
 <%- include('partials/footer') %>
-

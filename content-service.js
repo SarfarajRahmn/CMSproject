@@ -632,8 +632,9 @@ module.exports = {
           subtitle: courseData.subtitle || "",
           category: courseData.category || "General",
           level: courseData.level || "All Levels",
-          price: parseFloat(courseData.price) || 49,
-          originalPrice: parseFloat(courseData.originalPrice) || (parseFloat(courseData.price) || 49) * 1.5,
+          price: parseFloat(courseData.price) || 3500,
+          originalPrice: parseFloat(courseData.originalPrice) || (parseFloat(courseData.price) || 3500) * 1.5,
+          currency: "৳",
           duration: courseData.duration || "Self-Paced",
           lessonsCount: parseInt(courseData.lessonsCount, 10) || 20,
           rating: 5.0,
@@ -643,7 +644,7 @@ module.exports = {
           thumbnail: courseData.thumbnail || "/images/CONTENT.png",
           instructor: {
             name: courseData.instructorName || "Sarfaraj Rahman",
-            title: courseData.instructorTitle || "Lead Instructor",
+            title: courseData.instructorTitle || "Lead Instructor & Software Engineer",
             avatar: courseData.instructorAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
           },
           highlights: highlights.length > 0 ? highlights : [
@@ -682,6 +683,39 @@ module.exports = {
         }
 
         const existing = courses[index];
+
+        // Process highlights if provided
+        let highlights = existing.highlights;
+        if (courseData.highlights !== undefined) {
+          if (Array.isArray(courseData.highlights)) {
+            highlights = courseData.highlights;
+          } else if (typeof courseData.highlights === "string") {
+            highlights = courseData.highlights.split("\n").map(h => h.trim()).filter(h => h.length > 0);
+          }
+        }
+
+        // Process syllabus if provided
+        let syllabus = existing.syllabus;
+        if (courseData.syllabus !== undefined) {
+          if (Array.isArray(courseData.syllabus)) {
+            syllabus = courseData.syllabus;
+          } else if (typeof courseData.syllabus === "string") {
+            try {
+              syllabus = JSON.parse(courseData.syllabus);
+            } catch (e) {
+              const lines = courseData.syllabus.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+              if (lines.length > 0) {
+                syllabus = [
+                  {
+                    module: "Course Modules & Lessons",
+                    lessons: lines
+                  }
+                ];
+              }
+            }
+          }
+        }
+
         const updated = {
           ...existing,
           title: courseData.title !== undefined ? courseData.title : existing.title,
@@ -690,10 +724,18 @@ module.exports = {
           level: courseData.level !== undefined ? courseData.level : existing.level,
           price: courseData.price !== undefined ? parseFloat(courseData.price) : existing.price,
           originalPrice: courseData.originalPrice !== undefined ? parseFloat(courseData.originalPrice) : existing.originalPrice,
+          currency: "৳",
           duration: courseData.duration !== undefined ? courseData.duration : existing.duration,
           lessonsCount: courseData.lessonsCount !== undefined ? parseInt(courseData.lessonsCount, 10) : existing.lessonsCount,
           badge: courseData.badge !== undefined ? courseData.badge : existing.badge,
           thumbnail: courseData.thumbnail || existing.thumbnail,
+          highlights: highlights,
+          syllabus: syllabus,
+          instructor: {
+            name: courseData.instructorName || (existing.instructor ? existing.instructor.name : "Sarfaraj Rahman"),
+            title: courseData.instructorTitle || (existing.instructor ? existing.instructor.title : "Senior Software Engineer"),
+            avatar: courseData.instructorAvatar || (existing.instructor ? existing.instructor.avatar : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"),
+          },
           published: courseData.published !== undefined
             ? Boolean(courseData.published === true || courseData.published === "true" || courseData.published === "on")
             : existing.published,

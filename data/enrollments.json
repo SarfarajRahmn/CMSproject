@@ -26,5 +26,19 @@
     "currency": "৳",
     "enrollmentDate": "2024-11-03",
     "status": "Active"
+  },
+  {
+    "id": "ENR-1003",
+    "courseId": 1,
+    "courseTitle": "Full-Stack Web Development Bootcamp (MERN & Next.js)",
+    "studentName": "মুনতাসির আহমেদ",
+    "studentEmail": "muntasir.ahmed@example.com",
+    "studentPhone": "01712345678",
+    "paymentMethod": "bKash",
+    "trxId": "9K2M4P6Q8R",
+    "amountPaid": 4500,
+    "currency": "৳",
+    "enrollmentDate": "2026-11-07",
+    "status": "Confirmed"
   }
 ]
