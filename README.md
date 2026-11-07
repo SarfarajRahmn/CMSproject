@@ -14,11 +14,12 @@ A full-featured, responsive **Content Management System (CMS)** web application 
 
 ## 🌟 Key Features
 
-- **Course E-Commerce & Academy Platform**:
-  - **Course Catalog**: Filterable catalog of courses with price tags, discount badges, ratings, difficulty levels, and durations.
+- **Course E-Commerce & Academy Platform (Bangladesh BDT ৳)**:
+  - **Course Catalog**: Filterable catalog of courses with Bangladesh Taka (`৳ BDT`) pricing, reactive discounts, ratings, difficulty levels, and durations.
+  - **Reactive Search & Sorting**: Real-time keyword search with instant clear (`×`) and live client-side sorting (price, rating, popularity).
   - **Curriculum & Syllabus Accordion**: Interactive modules and lectures breakdown for each course.
-  - **Direct Enrollment & Checkout**: Modal checkout workflow with student contact collection, payment method selection, and instant confirmation receipt.
-  - **Instructor Management**: Publish, edit, or delete courses dynamically with thumbnail uploads and pricing controls.
+  - **Bangladesh MFS & Card Checkout**: Modal checkout workflow with student contact collection, operator-validated BD phone format (`01[3-9]\d{8}`), payment via **bKash (বিকাশ)**, **Nagad (নগদ)**, **Rocket (রকেট)**, or **Cards**, and printable confirmation receipts.
+  - **Live Reactive Admin Preview**: Publish and edit courses with live reactive discount calculators and real-time course card previews.
 - **Full Article CRUD Operations**:
   - **Create**: Write and publish rich articles with author attribution, categories, and image upload.
   - **Read**: Interactive catalog with real-time keyword search, category filtering, and toggleable **Card** & **Table** views.
@@ -55,7 +56,9 @@ A full-featured, responsive **Content Management System (CMS)** web application 
 CMSproject/
 ├── data/
 │   ├── articles.json           # Local articles datastore
-│   └── categories.json         # Local categories datastore
+│   ├── categories.json         # Local categories datastore
+│   ├── courses.json            # Course catalog datastore (BDT pricing)
+│   └── enrollments.json        # Student enrollment orders datastore
 ├── public/
 │   ├── css/
 │   │   ├── main.css            # Custom modern theme styles
